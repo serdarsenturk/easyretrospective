@@ -31,3 +31,8 @@ six==1.15.0
 tidal-dl==2020.9.10.0
 urllib3==1.25.10
 Werkzeug==1.0.1
+flask
+python-dotenv
+python-jose
+flask-cors
+six
