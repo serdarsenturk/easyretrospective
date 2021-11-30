@@ -9,4 +9,3 @@ class Member(db.Model):
     name = db.Column(db.String(50), nullable=False)
     mail = db.Column(db.String(255), nullable=False)
     password = db.Column(db.String(15), nullable=False)
-    membership_id = db.Column(db.Integer, db.ForeignKey('membership.id'), nullable=False)
