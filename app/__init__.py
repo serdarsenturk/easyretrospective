@@ -14,6 +14,8 @@ db = SQLAlchemy(app)
 
 # Import a module / component using its blueprint handler variable (ex./url)
 from app.api.home import home
+from app.api.board import boards
 
 #Register blueprint(s)
 app.register_blueprint(home)
+app.register_blueprint(boards)
