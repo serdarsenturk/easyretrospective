@@ -23,3 +23,11 @@ def generate_board_code(board):
         db.session.rollback()
         return generate_board_code(board)
 
+@boards.route('/', methods=["POST"])
+def create_board():
+    id = request.json['id']
+
+    new_board = Board(id=id)
+
+    return board_schema.dump(generate_board_code(new_board))
+
