@@ -23,3 +23,5 @@ from app.api.board import boards
 #Register blueprint(s)
 app.register_blueprint(home)
 app.register_blueprint(boards)
+
+db.create_all()
