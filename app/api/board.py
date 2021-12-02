@@ -31,3 +31,10 @@ def create_board():
 
     return board_schema.dump(generate_board_code(new_board))
 
+@boards.route('<code>', methods=["GET"])
+def get_board_by_code(code):
+    board = db.session.query(Board) \
+        .filter(Board.code == code) \
+        .first()
+
+    return jsonify(board_schema.dump(board))
