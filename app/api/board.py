@@ -1,10 +1,11 @@
 import base62
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 from sqlalchemy import Sequence
 from sqlalchemy.exc import IntegrityError
 
 from app import db
 from app.models.board import Board
+from app.models.member import Member
 from app.schema.board import board_schema, boards_schema
 
 boards = Blueprint('boards', __name__, url_prefix='/api/v1/boards/')
