@@ -47,9 +47,3 @@ def get_member_boards(memberId):
         .all()
 
     return jsonify(boards_schema.dump(member_boards))
-
-@boards.route('/teams/1', methods=["GET"])
-def get_teams_boards():
-    team_boards = db.session.query(Board).all()
-
-    return jsonify(boards_schema.dump(team_boards))
