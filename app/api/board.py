@@ -8,7 +8,7 @@ from app.models.board import Board
 from app.models.member import Member
 from app.schema.board import board_schema, boards_schema
 
-boards = Blueprint('boards', __name__, url_prefix='/api/v1/boards/')
+boards = Blueprint('boards', __name__)
 
 def generate_board_code(board):
     try:
@@ -24,26 +24,26 @@ def generate_board_code(board):
         db.session.rollback()
         return generate_board_code(board)
 
-@boards.route('members/<member_id>', methods=["POST"])
+@boards.route('/api/v1/members/<member_id>/boards', methods=["POST"])
 def create_board(member_id):
 
     new_board = Board(member_id=member_id)
 
     return board_schema.dump(generate_board_code(new_board))
 
-@boards.route('<code>/members/<memberId>/', methods=["GET"])
-def get_board_by_code(memberId, code):
+@boards.route('/api/v1/members/<member_id>/boards/<code>', methods=["GET"])
+def get_board_by_code(member_id, code):
     board = db.session.query(Board) \
         .filter(Board.code == code) \
-        .filter(Board.member_id == memberId) \
+        .filter(Board.member_id == member_id) \
         .first()
 
     return jsonify(board_schema.dump(board))
 
-@boards.route('members/<memberId>', methods=["GET"])
-def get_member_boards(memberId):
+@boards.route('/api/v1/members/<member_id>/boards', methods=["GET"])
+def get_member_boards(member_id):
     member_boards = db.session.query(Board) \
-        .filter(Board.member_id == memberId ) \
+        .filter(Board.member_id == member_id ) \
         .all()
 
     return jsonify(boards_schema.dump(member_boards))
