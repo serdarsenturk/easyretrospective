@@ -40,9 +40,11 @@ def get_board_by_code(memberId, code):
 
     return jsonify(board_schema.dump(board))
 
-@boards.route('/member/1', methods=["GET"])
-def get_member_boards():
-    member_boards = db.session.query(Board).all()
+@boards.route('members/<memberId>', methods=["GET"])
+def get_member_boards(memberId):
+    member_boards = db.session.query(Board) \
+        .filter(Board.member_id == memberId ) \
+        .all()
 
     return jsonify(boards_schema.dump(member_boards))
 
