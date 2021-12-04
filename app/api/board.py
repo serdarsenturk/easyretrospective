@@ -6,6 +6,8 @@ from sqlalchemy.exc import IntegrityError
 from app import db
 from app.models.board import Board
 from app.models.member import Member
+from app.models.column import Column
+from app.models.card import Card
 from app.schema.board import board_schema, boards_schema
 
 boards = Blueprint('boards', __name__)
@@ -26,16 +28,14 @@ def generate_board_code(board):
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["POST"])
 def create_board(member_id):
-
     new_board = Board(member_id=member_id)
 
     return board_schema.dump(generate_board_code(new_board))
 
-@boards.route('/api/v1/members/<member_id>/boards/<code>', methods=["GET"])
-def get_board_by_code(member_id, code):
+@boards.route('/api/v1/boards/<code>', methods=["GET"])
+def get_board_by_code(code):
     board = db.session.query(Board) \
         .filter(Board.code == code) \
-        .filter(Board.member_id == member_id) \
         .first()
 
     return jsonify(board_schema.dump(board))
