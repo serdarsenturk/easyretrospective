@@ -41,6 +41,18 @@ def create_board(member_id):
 
     return board_schema.dump(generate_board_code(new_board))
 
+@boards.route('/api/v1/members/<id>/boards/<code>', methods=["DELETE"])
+def delete_board_by_code(id, code):
+    board = db.session.query(Board) \
+        .filter(Board.code == code) \
+        .filter(Board.member_id == id) \
+        .first()
+
+    db.session.delete(board)
+    db.session.commit()
+
+    return jsonify(board_schema.dump(board))
+
 @boards.route('/api/v1/boards/<code>', methods=["GET"])
 def get_board_by_code(code):
     board = db.session.query(Board) \
