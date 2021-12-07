@@ -1,13 +1,15 @@
 import base62
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
+from flask_cors import CORS
 from sqlalchemy import Sequence
 from sqlalchemy.exc import IntegrityError
-
-from app import db
+from app import db, app
 from app.models.board import Board
+from app.models.column import Column
 from app.schema.board import board_schema, boards_schema
 
 boards = Blueprint('boards', __name__)
+CORS(boards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
 
 def generate_board_code(board):
     try:
