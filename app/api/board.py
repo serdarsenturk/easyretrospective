@@ -13,9 +13,19 @@ CORS(boards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
 
 def generate_board_code(board):
     try:
+        board.name = "Retro 5/11/21"
         board.id = db.session.execute(Sequence("boards_id_seq"))
         board.code = base62.encode(hash(('boards', board.id)), 8)[-8:]
 
+        column1 = Column(name = "What went well", board_id= board.id)
+        column2 = Column(name = "What didn't go well ", board_id= board.id)
+        column3 = Column(name = "To improve", board_id= board.id)
+
+        board.columns = [column1, column2, column3]
+
+        db.session.add(column1)
+        db.session.add(column2)
+        db.session.add(column3)
         db.session.add(board)
         db.session.commit()
 
