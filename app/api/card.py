@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify
-from app import db
+from flask_cors import CORS
+
+from app import db, app
 from app.models.board import Board
 from app.models.card import Card
 from app.models.column import Column
@@ -7,6 +9,7 @@ from app.models.member import Member
 from app.schema.card import card_schema
 
 cards = Blueprint('cards', __name__, url_prefix='/api/v1/members/<member_id>/boards/<code>/columns/<column_id>/cards')
+CORS(cards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
 
 @cards.route('', methods=["POST"])
 def create_card(member_id, code, column_id):
