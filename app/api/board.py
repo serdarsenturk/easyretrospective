@@ -61,6 +61,7 @@ def get_board_by_code(code):
 
     return jsonify(board_schema.dump(board))
 
+@boards.route('/api/v1/members/<member_id>/boards/<code>/name', methods=["PUT"])
 @boards.route('/api/v1/members/<member_id>/boards', methods=["GET"])
 def get_member_boards(member_id):
     member_boards = db.session.query(Board) \
