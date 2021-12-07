@@ -62,6 +62,20 @@ def get_board_by_code(code):
     return jsonify(board_schema.dump(board))
 
 @boards.route('/api/v1/members/<member_id>/boards/<code>/name', methods=["PUT"])
+def modify_board_name_by_code(member_id, code):
+    board = db.session.query(Board) \
+        .filter(Board.code == code) \
+        .filter(Board.member_id == member_id) \
+        .first()
+
+    modified_name = request.json['name']
+
+    board.name = modified_name
+
+    db.session.commit()
+
+    return jsonify(board_schema.dump(board))
+
 @boards.route('/api/v1/members/<member_id>/boards', methods=["GET"])
 def get_member_boards(member_id):
     member_boards = db.session.query(Board) \
