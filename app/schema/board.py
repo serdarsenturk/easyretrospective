@@ -8,6 +8,7 @@ class BoardSchema(ma.SQLAlchemyAutoSchema):
     name = fields.Str()
     code = fields.Str()
     member_id = fields.Int()
+    team_id = fields.Int()
     columns = fields.Nested(ColumnSchema, many=True)
 
 board_schema = BoardSchema()
