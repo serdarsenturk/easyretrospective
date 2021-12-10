@@ -6,6 +6,8 @@ from sqlalchemy.exc import IntegrityError
 from app import db, app
 from app.models.board import Board
 from app.models.column import Column
+from app.models.member import Member
+from app.models.team import Team
 from app.schema.board import board_schema, boards_schema
 
 boards = Blueprint('boards', __name__)
