@@ -86,3 +86,4 @@ def get_member_boards(member_id):
 
     return jsonify(boards_schema.dump(member_boards))
 
+@boards.route('/api/v1/teams/<team_id>/boards', methods=["GET"])
