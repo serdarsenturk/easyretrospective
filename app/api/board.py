@@ -87,3 +87,9 @@ def get_member_boards(member_id):
     return jsonify(boards_schema.dump(member_boards))
 
 @boards.route('/api/v1/teams/<team_id>/boards', methods=["GET"])
+def get_team_boards(team_id):
+    team_boards = db.session.query(Board) \
+        .filter(Board.team_id == team_id ) \
+        .all()
+
+    return jsonify(boards_schema.dump(team_boards))
