@@ -1,3 +1,4 @@
+from datetime import datetime
 import base62
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS
@@ -13,23 +14,22 @@ from app.schema.board import board_schema, boards_schema
 boards = Blueprint('boards', __name__)
 CORS(boards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
 
-def generate_board_code(board):
-    try:
+def add_default_properties(board):
         board.name = "Retro 5/11/21"
-        board.id = db.session.execute(Sequence("boards_id_seq"))
-        board.code = base62.encode(hash(('boards', board.id)), 8)[-8:]
+        generate_board_code(board)
 
-        column1 = Column(name = "What went well", board_id= board.id)
-        column2 = Column(name = "What didn't go well ", board_id= board.id)
-        column3 = Column(name = "To improve", board_id= board.id)
+        columns = [Column(name = "What went well", board_id= board.id), Column(name = "What didn't go well ", board_id= board.id), Column(name = "To improve", board_id= board.id)]
+        board.columns = columns
 
-        board.columns = [column1, column2, column3]
-
-        db.session.add(column1)
-        db.session.add(column2)
-        db.session.add(column3)
         db.session.add(board)
         db.session.commit()
+
+        return board
+
+def generate_board_code(board):
+    try:
+        board.id = db.session.execute(Sequence("boards_id_seq"))
+        board.code = base62.encode(hash(('boards', board.id)), 8)[-8:]
 
         return board
 
