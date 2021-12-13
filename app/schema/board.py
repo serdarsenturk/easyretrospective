@@ -7,6 +7,7 @@ class BoardSchema(ma.SQLAlchemyAutoSchema):
     id = fields.Int()
     name = fields.Str()
     code = fields.Str()
+    date = fields.DateTime()
     member_id = fields.Int()
     team_id = fields.Int()
     columns = fields.Nested(ColumnSchema, many=True)
