@@ -18,12 +18,13 @@ def create_card(member_id, code, column_id):
         .filter(Board.code == code) \
         .filter(Board.member_id == member_id) \
         .first()
-    board_id = board.id
 
     new_card = Card(content = content, member_id = member_id, column_id = column_id)
 
     db.session.add(new_card)
     db.session.commit()
+
+    pusher.trigger(f"board-{board.code}", 'card-created', None)
 
     return jsonify(card_schema.dump(new_card))
 
@@ -36,13 +37,10 @@ def delete_card_by_id(member_id, code, column_id, card_id):
         .filter(Member.id == member_id) \
         .first()
 
-    board = db.session.query(Board) \
-        .filter(Board.code == code) \
-        .filter(Board.member_id == member_id) \
-        .first()
-
     db.session.delete(card)
     db.session.commit()
+
+    pusher.trigger(f"board-{code}", 'card-deleted', None)
 
     return jsonify(card_schema.dump(card))
 
@@ -54,11 +52,6 @@ def modify_card_content_by_id(member_id, code, column_id, card_id):
         .filter(Column.id == column_id) \
         .filter(Board.code == code) \
         .filter(Member.id == member_id) \
-        .first()
-
-    board = db.session.query(Board) \
-        .filter(Board.code == code) \
-        .filter(Board.member_id == member_id) \
         .first()
 
     new_content = request.json['content']
