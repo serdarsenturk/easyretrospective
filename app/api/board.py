@@ -10,6 +10,7 @@ from app.models.column import Column
 from app.models.member import Member
 from app.models.team import Team
 from app.schema.board import board_schema, boards_schema
+from app.schema.team_board import team_boards_schema
 
 boards = Blueprint('boards', __name__)
 CORS(boards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
@@ -93,4 +94,4 @@ def get_team_boards(team_id):
         .filter(Board.team_id == team_id ) \
         .all()
 
-    return jsonify(boards_schema.dump(team_boards))
+    return jsonify(team_boards_schema.dump(team_boards))
