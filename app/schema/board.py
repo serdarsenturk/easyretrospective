@@ -2,9 +2,7 @@ from marshmallow import fields
 from app import ma
 from app.schema.column import ColumnSchema
 
-
 class BoardSchema(ma.SQLAlchemyAutoSchema):
-    id = fields.Int()
     name = fields.Str()
     code = fields.Str()
     date = fields.DateTime()
