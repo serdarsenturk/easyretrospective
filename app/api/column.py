@@ -5,6 +5,7 @@ from app import db, app
 from app.models.board import Board
 from app.models.column import Column
 from app.schema.column import column_schema
+from app.schema.column_updated import column_updated_schema
 
 columns = Blueprint('columns', __name__, url_prefix='/api/v1/members/<member_id>/boards/<code>/columns')
 CORS(columns, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
@@ -36,8 +37,8 @@ def delete_column_by_id(member_id, code, column_id):
     db.session.delete(column)
     db.session.commit()
 
-    return jsonify(column_schema.dump(column))
 
+    return jsonify(column_updated_schema.dump(column))
 
 @columns.route('<column_id>/name', methods=['PUT'])
 def modify_column_by_id(member_id, code, column_id):
@@ -51,4 +52,5 @@ def modify_column_by_id(member_id, code, column_id):
 
     db.session.commit()
 
-    return jsonify(column_schema.dump(column))
+    # pusher.trigger(f"board-{code}", 'column-updated', None)
+    return jsonify(column_updated_schema.dump(column))
