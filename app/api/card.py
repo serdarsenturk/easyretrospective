@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import CORS
-
 from app import db, app
 from app.models.board import Board
 from app.models.card import Card
@@ -14,10 +13,6 @@ CORS(cards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
 @cards.route('', methods=["POST"])
 def create_card(member_id, code, column_id):
     content = request.json['content']
-    board = db.session.query(Board) \
-        .filter(Board.code == code) \
-        .filter(Board.member_id == member_id) \
-        .first()
 
     new_card = Card(content = content, member_id = member_id, column_id = column_id)
 
