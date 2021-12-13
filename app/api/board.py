@@ -42,7 +42,7 @@ def generate_board_code(board):
 def create_board(member_id):
     new_board = Board(member_id=member_id)
 
-    return board_schema.dump(generate_board_code(new_board))
+    return board_schema.dump(add_default_properties(new_board))
 
 @boards.route('/api/v1/members/<id>/boards/<code>', methods=["DELETE"])
 def delete_board_by_code(id, code):
