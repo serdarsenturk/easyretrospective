@@ -6,7 +6,6 @@ from app.schema.card import CardSchema
 class ColumnSchema(ma.SQLAlchemyAutoSchema):
     id = fields.Int()
     name = fields.Str()
-    board_id = fields.Int()
     cards = fields.Nested(CardSchema, many=True)
 
 column_schema = ColumnSchema()
