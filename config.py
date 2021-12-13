@@ -1,2 +1,7 @@
-# Statement for enabling the development environment
-DEBUG = True
+import os
+
+class Config:
+    SQLALCHEMY_DATABASE_URI = os.environ['DB_CONNECTION_STRING']
+    SQLALCHEMY_ECHO = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    CORS_ORIGINS = os.environ['CORS_ORIGINS']
