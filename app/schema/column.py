@@ -9,4 +9,3 @@ class ColumnSchema(ma.SQLAlchemyAutoSchema):
     cards = fields.Nested(CardSchema, many=True)
 
 column_schema = ColumnSchema()
-columns_schema = ColumnSchema(many=True)
