@@ -62,7 +62,13 @@ def get_board_by_code(code):
         .filter(Board.code == code) \
         .first()
 
-    return jsonify(board_schema.dump(board))
+    resp = {
+        'code': board.code,
+        'name': board.name,
+        'date': board.date
+    }
+
+    return jsonify(resp)
 
 @boards.route('/api/v1/members/<member_id>/boards/<code>/name', methods=["PUT"])
 def modify_board_name_by_code(member_id, code):
