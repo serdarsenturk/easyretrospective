@@ -17,6 +17,7 @@ CORS(boards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
 def add_default_properties(board):
         board.name = "Retro 5/11/21"
         generate_board_code(board)
+        board.date = datetime.now().isoformat()
 
         columns = [Column(name = "What went well", board_id= board.id), Column(name = "What didn't go well ", board_id= board.id), Column(name = "To improve", board_id= board.id)]
         board.columns = columns
