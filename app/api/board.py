@@ -10,6 +10,7 @@ from app.models.column import Column
 from app.models.member import Member
 from app.models.team import Team
 from app.schema.board import board_schema, boards_schema
+from app.schema.member_board import member_boards_schema
 from app.schema.team_board import team_boards_schema
 
 boards = Blueprint('boards', __name__)
@@ -86,7 +87,7 @@ def get_member_boards(member_id):
         .filter(Board.member_id == member_id ) \
         .all()
 
-    return jsonify(boards_schema.dump(member_boards))
+    return jsonify(member_boards_schema.dump(member_boards))
 
 @boards.route('/api/v1/teams/<team_id>/boards', methods=["GET"])
 def get_team_boards(team_id):
