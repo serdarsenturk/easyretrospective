@@ -49,11 +49,15 @@ def delete_column_by_id(member_id, code, column_id):
         .filter(Column.id == column_id) \
         .first()
 
-    db.session.delete(column)
-    db.session.commit()
+    try:
+        db.session.delete(column)
+        db.session.commit()
 
 
-    return jsonify(column_updated_schema.dump(column))
+        return jsonify(column_updated_schema.dump(column))
+    except:
+        db.session.rollback()
+
 
 @columns.route('<column_id>/name', methods=['PUT'])
 def modify_column_by_id(member_id, code, column_id):
