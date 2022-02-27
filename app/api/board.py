@@ -85,9 +85,12 @@ def modify_board_name_by_code(member_id, code):
 
     board.name = modified_name
 
-    db.session.commit()
+    try:
+        db.session.commit()
 
-    return jsonify(board_schema.dump(board))
+        return jsonify(board_schema.dump(board))
+    except:
+        db.session.rollback()
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["GET"])
 def get_member_boards(member_id):
