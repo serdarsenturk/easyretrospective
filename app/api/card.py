@@ -29,6 +29,7 @@ def create_card(member_id, code, column_id):
         db.session.add(new_card)
         db.session.commit()
 
+        pusher.trigger(f"board-{code}-{column_id}", 'card-created', {"column_id": column_id, "content": content, "id": new_card.id, "member_id": member_id})
 
         return jsonify(card_schema.dump(new_card))
     except:
