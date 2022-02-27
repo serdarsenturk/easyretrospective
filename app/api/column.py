@@ -53,6 +53,7 @@ def delete_column_by_id(member_id, code, column_id):
         db.session.delete(column)
         db.session.commit()
 
+        pusher.trigger(f"board-{code}", 'column-deleted', {"id": column_id, "name": column.name, "cards": []})
 
         return jsonify(column_updated_schema.dump(column))
     except:
