@@ -68,9 +68,14 @@ def modify_column_by_id(member_id, code, column_id):
         .filter(Column.id == column_id) \
         .first()
 
-    column.name = request.json['name']
+    name = request.json['name']
 
-    db.session.commit()
+    try:
+        column.name = name
 
-    # pusher.trigger(f"board-{code}", 'column-updated', None)
-    return jsonify(column_updated_schema.dump(column))
+        db.session.commit()
+
+
+        return jsonify(column_updated_schema.dump(column))
+    except:
+        db.session.rollback()
