@@ -75,6 +75,7 @@ def modify_column_by_id(member_id, code, column_id):
 
         db.session.commit()
 
+        pusher.trigger(f"board-{code}", 'column-updated', {"id": column.id, "name": name})
 
         return jsonify(column_updated_schema.dump(column))
     except:
