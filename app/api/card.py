@@ -71,6 +71,7 @@ def modify_card_content_by_id(member_id, code, column_id, card_id):
 
         db.session.commit()
 
+        pusher.trigger(f"board-{code}-{column_id}", 'card-updated', {"id": card.id, "content": new_content})
 
         return jsonify(card_schema.dump(card))
     except:
