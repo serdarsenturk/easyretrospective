@@ -25,10 +25,14 @@ def create_card(member_id, code, column_id):
 
     new_card = Card(content = content, member_id = member_id, column_id = column_id)
 
-    db.session.add(new_card)
-    db.session.commit()
+    try:
+        db.session.add(new_card)
+        db.session.commit()
 
-    return jsonify(card_schema.dump(new_card))
+
+        return jsonify(card_schema.dump(new_card))
+    except:
+        db.session.rollback()
 
 @cards.route('<card_id>', methods=["DELETE"])
 def delete_card_by_id(member_id, code, column_id, card_id):
