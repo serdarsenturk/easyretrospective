@@ -58,10 +58,13 @@ def delete_board_by_code(id, code):
         .filter(Board.member_id == id) \
         .first()
 
-    db.session.delete(board)
-    db.session.commit()
+    try:
+        db.session.delete(board)
+        db.session.commit()
 
-    return jsonify(board_schema.dump(board))
+        return jsonify(board_schema.dump(board))
+    except:
+        db.session.rollback()
 
 @boards.route('/api/v1/boards/<code>', methods=["GET"])
 def get_board_by_code(code):
