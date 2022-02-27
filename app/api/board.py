@@ -1,17 +1,17 @@
-from datetime import datetime
-import base62
-from flask import Blueprint, jsonify, request
+from app import db, app
 from flask_cors import CORS
 from sqlalchemy import Sequence
 from sqlalchemy.exc import IntegrityError
-from app import db, app
+from flask import Blueprint, jsonify, request
+from datetime import datetime
+import base62
+from app.schema.board import board_schema
+from app.schema.member_board import member_boards_schema
+from app.schema.team_board import team_boards_schema
 from app.models.board import Board
 from app.models.column import Column
 from app.models.member import Member
 from app.models.team import Team
-from app.schema.board import board_schema
-from app.schema.member_board import member_boards_schema
-from app.schema.team_board import team_boards_schema
 
 boards = Blueprint('boards', __name__)
 CORS(boards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
