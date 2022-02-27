@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import CORS
-
+from pusher import Pusher
 from app import db, app
 from app.models.board import Board
 from app.models.column import Column
