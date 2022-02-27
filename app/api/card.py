@@ -11,6 +11,14 @@ from pusher import Pusher
 cards = Blueprint('cards', __name__, url_prefix='/api/v1/members/<member_id>/boards/<code>/columns/<column_id>/cards')
 CORS(cards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
 
+pusher = Pusher(
+    app_id=app.config.get('PUSHER_APP_ID'),
+    key=app.config.get('PUSHER_KEY'),
+    secret=app.config.get('PUSHER_SECRET'),
+    cluster='eu',
+    ssl=True
+)
+
 @cards.route('', methods=["POST"])
 def create_card(member_id, code, column_id):
     content = request.json['content']
