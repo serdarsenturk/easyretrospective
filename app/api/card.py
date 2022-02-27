@@ -44,10 +44,15 @@ def delete_card_by_id(member_id, code, column_id, card_id):
         .filter(Member.id == member_id) \
         .first()
 
-    db.session.delete(card)
-    db.session.commit()
+    try:
+        db.session.delete(card)
+        db.session.commit()
 
-    return jsonify(card_schema.dump(card))
+
+        return jsonify(card_schema.dump(card))
+    except:
+        db.session.rollback()
+
 
 @cards.route('<card_id>/content', methods=["PUT"])
 def modify_card_content_by_id(member_id, code, column_id, card_id):
