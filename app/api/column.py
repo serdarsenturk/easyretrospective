@@ -21,18 +21,24 @@ pusher = Pusher(
 @columns.route('', methods=["POST"])
 def create_column(member_id, code):
     name = request.json['name']
+
     board = db.session.query(Board) \
         .filter(Board.code == code) \
         .filter(Board.member_id == member_id) \
         .first()
 
     board_id = board.id
+
     new_column = Column(name = name, board_id=board_id)
 
-    db.session.add(new_column)
-    db.session.commit()
+    try:
+        db.session.add(new_column)
+        db.session.commit()
 
-    return jsonify(column_schema.dump(new_column))
+
+        return jsonify(column_schema.dump(new_column))
+    except:
+        db.session.rollback()
 
 @columns.route('<column_id>', methods=['DELETE'])
 def delete_column_by_id(member_id, code, column_id):
