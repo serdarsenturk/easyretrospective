@@ -65,8 +65,13 @@ def modify_card_content_by_id(member_id, code, column_id, card_id):
         .first()
 
     new_content = request.json['content']
-    card.content = new_content
 
-    db.session.commit()
+    try:
+        card.content = new_content
 
-    return jsonify(card_schema.dump(card))
+        db.session.commit()
+
+
+        return jsonify(card_schema.dump(card))
+    except:
+        db.session.rollback()
