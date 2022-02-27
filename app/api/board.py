@@ -26,10 +26,13 @@ def add_default_properties(board):
         columns = [Column(name = "What went well", board_id= board.id), Column(name = "What didn't go well ", board_id= board.id), Column(name = "To improve", board_id= board.id)]
         board.columns = columns
 
-        db.session.add(board)
-        db.session.commit()
+        try:
+            db.session.add(board)
+            db.session.commit()
 
-        return board
+            return board
+        except:
+            db.session.rollback()
 
 def generate_board_code(board):
     try:
