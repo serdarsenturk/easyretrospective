@@ -35,6 +35,7 @@ def create_column(member_id, code):
         db.session.add(new_column)
         db.session.commit()
 
+        pusher.trigger(f"board-{code}", 'column-created', {"id": new_column.id, "name": name, "cards": []})
 
         return jsonify(column_schema.dump(new_column))
     except:
