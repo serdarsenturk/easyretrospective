@@ -10,6 +10,14 @@ from app.schema.column_updated import column_updated_schema
 columns = Blueprint('columns', __name__, url_prefix='/api/v1/members/<member_id>/boards/<code>/columns')
 CORS(columns, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
 
+pusher = Pusher(
+    app_id=app.config.get('PUSHER_APP_ID'),
+    key=app.config.get('PUSHER_KEY'),
+    secret=app.config.get('PUSHER_SECRET'),
+    cluster='eu',
+    ssl=True
+)
+
 @columns.route('', methods=["POST"])
 def create_column(member_id, code):
     name = request.json['name']
