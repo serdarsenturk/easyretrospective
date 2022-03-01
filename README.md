@@ -10,9 +10,26 @@ cd easyretrospective
 
 ###`Flask Setup:`
 ```bash
+# install virtualenv
+pip install virtualenv
+
+# create virtual environment instance
+virtualenv venv
+
+# active venv
+source venv/bin/activate
+
+# deactivate venv
+deactivate
+
+# install flask and gunicorn
 pip3 install flask gunicorn
-pip3 freeze > requirements.txt
+
+# install all libraries in requirements.txt
 pip3 install -r requirements.txt
+
+# added to new libraries to requirements.txt was installed
+pip3 freeze > requirements.txt
 ```
 
 ####Start to Flask app following commands:
