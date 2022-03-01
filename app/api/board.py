@@ -17,6 +17,14 @@ from app.models.team import Team
 boards = Blueprint('boards', __name__)
 CORS(boards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
 
+pusher = Pusher(
+    app_id=app.config.get('PUSHER_APP_ID'),
+    key=app.config.get('PUSHER_KEY'),
+    secret=app.config.get('PUSHER_SECRET'),
+    cluster='eu',
+    ssl=True
+)
+
 def add_default_properties(board):
         generate_board_code(board)
 
