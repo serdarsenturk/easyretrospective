@@ -65,11 +65,11 @@ def create_board(member_id):
     except:
         db.session.rollback()
 
-@boards.route('/api/v1/members/<id>/boards/<code>', methods=["DELETE"])
-def delete_board_by_code(id, code):
+@boards.route('/api/v1/members/<member_id>/boards/<code>', methods=["DELETE"])
+def delete_board_by_code(member_id, code):
     board = db.session.query(Board) \
         .filter(Board.code == code) \
-        .filter(Board.member_id == id) \
+        .filter(Board.member_id == member_id) \
         .first()
 
     try:
