@@ -84,11 +84,14 @@ def delete_board_by_code(member_id, code):
 
 @boards.route('/api/v1/boards/<code>', methods=["GET"])
 def get_board_by_code(code):
-    board = db.session.query(Board) \
-        .filter(Board.code == code) \
-        .first()
+    try:
+        board = db.session.query(Board) \
+            .filter(Board.code == code) \
+            .first()
 
-    return jsonify(board_schema.dump(board))
+        return jsonify(board_schema.dump(board))
+    except:
+        db.session.rollback()
 
 @boards.route('/api/v1/members/<member_id>/boards/<code>/name', methods=["PUT"])
 def modify_board_name_by_code(member_id, code):
