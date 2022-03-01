@@ -104,6 +104,8 @@ def modify_board_name_by_code(member_id, code):
     try:
         db.session.commit()
 
+        pusher.trigger(f"member-{member_id}", "board-updated", {"code": code, "name": board.name})
+
         return jsonify(board_schema.dump(board))
     except:
         db.session.rollback()
