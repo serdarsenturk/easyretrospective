@@ -59,6 +59,13 @@ def create_board(member_id):
     new_board = Board(member_id=member_id)
 
     try:
+        pusher.trigger(f"member-{member_id}", "board-created",
+            {
+                "code": new_board.code,
+                "date": new_board.date,
+                "member_id": new_board.member_id,
+                "name": new_board.name,
+                "team_id": new_board.team_id
             }
         )
         return board_schema.dump(add_default_properties(new_board))
