@@ -1,5 +1,6 @@
 from app import db, app
 from flask_cors import CORS
+from pusher import Pusher
 from sqlalchemy import Sequence
 from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, jsonify, request
