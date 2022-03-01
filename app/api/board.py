@@ -76,6 +76,8 @@ def delete_board_by_code(member_id, code):
         db.session.delete(board)
         db.session.commit()
 
+        pusher.trigger(f"member-{id}", "board-deleted", {"code": code, "member_id": id})
+
         return jsonify(board_schema.dump(board))
     except:
         db.session.rollback()
