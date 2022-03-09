@@ -1,20 +1,29 @@
-from datetime import datetime
-import base62
-from flask import Blueprint, jsonify, request
+from app import db, app
 from flask_cors import CORS
+from pusher import Pusher
 from sqlalchemy import Sequence
 from sqlalchemy.exc import IntegrityError
-from app import db, app
+from flask import Blueprint, jsonify, request
+from datetime import datetime
+import base62
+from app.schema.board import board_schema
+from app.schema.member_board import member_boards_schema
+from app.schema.team_board import team_boards_schema
 from app.models.board import Board
 from app.models.column import Column
 from app.models.member import Member
 from app.models.team import Team
-from app.schema.board import board_schema
-from app.schema.member_board import member_boards_schema
-from app.schema.team_board import team_boards_schema
 
 boards = Blueprint('boards', __name__)
 CORS(boards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
+
+pusher = Pusher(
+    app_id=app.config.get('PUSHER_APP_ID'),
+    key=app.config.get('PUSHER_KEY'),
+    secret=app.config.get('PUSHER_SECRET'),
+    cluster='eu',
+    ssl=True
+)
 
 def add_default_properties(board):
         generate_board_code(board)
@@ -26,10 +35,13 @@ def add_default_properties(board):
         columns = [Column(name = "What went well", board_id= board.id), Column(name = "What didn't go well ", board_id= board.id), Column(name = "To improve", board_id= board.id)]
         board.columns = columns
 
-        db.session.add(board)
-        db.session.commit()
+        try:
+            db.session.add(board)
+            db.session.commit()
 
-        return board
+            return board
+        except:
+            db.session.rollback()
 
 def generate_board_code(board):
     try:
@@ -46,27 +58,47 @@ def generate_board_code(board):
 def create_board(member_id):
     new_board = Board(member_id=member_id)
 
-    return board_schema.dump(add_default_properties(new_board))
+    try:
+        pusher.trigger(f"member-{member_id}", "board-created",
+            {
+                "code": new_board.code,
+                "date": new_board.date,
+                "member_id": new_board.member_id,
+                "name": new_board.name,
+                "team_id": new_board.team_id
+            }
+        )
+        return board_schema.dump(add_default_properties(new_board))
+    except:
+        db.session.rollback()
 
-@boards.route('/api/v1/members/<id>/boards/<code>', methods=["DELETE"])
-def delete_board_by_code(id, code):
+@boards.route('/api/v1/members/<member_id>/boards/<code>', methods=["DELETE"])
+def delete_board_by_code(member_id, code):
     board = db.session.query(Board) \
         .filter(Board.code == code) \
-        .filter(Board.member_id == id) \
+        .filter(Board.member_id == member_id) \
         .first()
 
-    db.session.delete(board)
-    db.session.commit()
+    try:
+        db.session.delete(board)
+        db.session.commit()
 
-    return jsonify(board_schema.dump(board))
+        pusher.trigger(f"member-{id}", "board-deleted", {"code": code, "member_id": id})
+
+        return jsonify(board_schema.dump(board))
+    except:
+        db.session.rollback()
 
 @boards.route('/api/v1/boards/<code>', methods=["GET"])
 def get_board_by_code(code):
-    board = db.session.query(Board) \
-        .filter(Board.code == code) \
-        .first()
+    try:
+        board = db.session.query(Board) \
+            .filter(Board.code == code) \
+            .first()
 
-    return jsonify(board_schema.dump(board))
+        return jsonify(board_schema.dump(board))
+    except:
+        db.session.rollback()
 
 @boards.route('/api/v1/members/<member_id>/boards/<code>/name', methods=["PUT"])
 def modify_board_name_by_code(member_id, code):
@@ -79,22 +111,33 @@ def modify_board_name_by_code(member_id, code):
 
     board.name = modified_name
 
-    db.session.commit()
+    try:
+        db.session.commit()
 
-    return jsonify(board_schema.dump(board))
+        pusher.trigger(f"member-{member_id}", "board-updated", {"code": code, "name": board.name})
+
+        return jsonify(board_schema.dump(board))
+    except:
+        db.session.rollback()
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["GET"])
 def get_member_boards(member_id):
-    member_boards = db.session.query(Board) \
-        .filter(Board.member_id == member_id ) \
-        .all()
+    try:
+        member_boards = db.session.query(Board) \
+            .filter(Board.member_id == member_id) \
+            .all()
+        return jsonify(member_boards_schema.dump(member_boards))
 
-    return jsonify(member_boards_schema.dump(member_boards))
+    except:
+        db.session.rollback()
 
 @boards.route('/api/v1/teams/<team_id>/boards', methods=["GET"])
 def get_team_boards(team_id):
-    team_boards = db.session.query(Board) \
-        .filter(Board.team_id == team_id ) \
-        .all()
+    try:
+        team_boards = db.session.query(Board) \
+            .filter(Board.team_id == team_id) \
+            .all()
 
-    return jsonify(team_boards_schema.dump(team_boards))
+        return jsonify(team_boards_schema.dump(team_boards))
+    except:
+        db.session.rollback()
