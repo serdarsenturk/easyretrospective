@@ -136,8 +136,8 @@ def get_member_boards(member_id):
 @boards.route('/api/v1/teams/<team_id>/boards', methods=["GET"])
 def get_team_boards(team_id):
     try:
-        team_boards = db.session.query(Board) \
-            .filter(Board.team_id == team_id) \
+        team_boards = db.session.query(Team) \
+            .filter(Team.id == team_id) \
             .all()
 
         return jsonify(team_boards_schema.dump(team_boards))
