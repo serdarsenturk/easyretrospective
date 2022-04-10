@@ -1,10 +1,11 @@
 from marshmallow import fields
 from app import ma
+from app.schema.board import BoardSchema
+
 
 class TeamBoardSchema(ma.SQLAlchemyAutoSchema):
     name = fields.Str()
-    code = fields.Str()
-    date = fields.DateTime()
+    boards = fields.Nested(BoardSchema, many=True, limit=3)
 
 team_board_schema = TeamBoardSchema()
 team_boards_schema = TeamBoardSchema(many=True)

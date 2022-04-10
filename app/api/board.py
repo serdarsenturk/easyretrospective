@@ -56,9 +56,14 @@ def generate_board_code(board):
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["POST"])
 def create_board(member_id):
-    new_board = Board(member_id=member_id)
+    team_id = request.json["team_id"]
 
     try:
+        if team_id:
+            new_board = Board(member_id=member_id, team_id=team_id)
+        else:
+            new_board = Board(member_id=member_id)
+
         pusher.trigger(f"member-{member_id}", "board-created",
             {
                 "code": new_board.code,
@@ -79,15 +84,12 @@ def delete_board_by_code(member_id, code):
         .filter(Board.member_id == member_id) \
         .first()
 
-    try:
-        db.session.delete(board)
-        db.session.commit()
+    db.session.delete(board)
+    db.session.commit()
 
-        pusher.trigger(f"member-{id}", "board-deleted", {"code": code, "member_id": id})
+    pusher.trigger(f"member-{id}", "board-deleted", {"code": code, "member_id": id})
 
-        return jsonify(board_schema.dump(board))
-    except:
-        db.session.rollback()
+    return jsonify(board_schema.dump(board))
 
 @boards.route('/api/v1/boards/<code>', methods=["GET"])
 def get_board_by_code(code):
@@ -134,8 +136,8 @@ def get_member_boards(member_id):
 @boards.route('/api/v1/teams/<team_id>/boards', methods=["GET"])
 def get_team_boards(team_id):
     try:
-        team_boards = db.session.query(Board) \
-            .filter(Board.team_id == team_id) \
+        team_boards = db.session.query(Team) \
+            .filter(Team.id == team_id) \
             .all()
 
         return jsonify(team_boards_schema.dump(team_boards))
