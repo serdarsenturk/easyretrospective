@@ -12,5 +12,5 @@ class Member(db.Model):
     email = db.Column(db.String(255), nullable=False)
     boards = db.relationship('Board', backref='member', lazy=True)
     cards = db.relationship('Card', backref='card', lazy=True)
-    teams_members = db.relationship('Team', secondary=teams_members, lazy='subquery',
+    teams = db.relationship('Team', secondary=teams_members, lazy='subquery',
         backref=db.backref('Member', lazy=True))
