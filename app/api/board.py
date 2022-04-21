@@ -52,26 +52,31 @@ def generate_board_code(board):
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["POST"])
 def create_board(member_id):
-    team_id = request.json["team_id"]
+    member = db.session.query(Member) \
+        .filter(Member.id == member_id) \
+        .first()
 
-    try:
-        if team_id:
-            new_board = Board(member_id=member_id, team_id=team_id)
-        else:
-            new_board = Board(member_id=member_id)
+    if member:
+        team_id = request.json["team_id"]
+        temp_board = Board(member_id=member_id, team_id=team_id)
 
-        pusher.trigger(f"member-{member_id}", "board-created",
-            {
-                "code": new_board.code,
-                "date": new_board.date,
-                "member_id": new_board.member_id,
-                "name": new_board.name,
-                "team_id": new_board.team_id
-            }
-        )
-        return board_schema.dump(add_default_properties(new_board))
-    except:
-        db.session.rollback()
+        try:
+            new_board = add_default_properties(temp_board)
+            pusher.trigger(f"member-{member_id}", "board-created",
+                           {
+                               "code": new_board.code,
+                               "date": new_board.date.__str__(),
+                               "member_id": new_board.member_id,
+                               "name": new_board.name,
+                               "team_id": new_board.team_id,
+                           }
+                           )
+
+            return board_schema.dump(new_board), 201
+        except Exception:
+            return '', 400
+    else:
+        return '', 401
 
 @boards.route('/api/v1/members/<member_id>/boards/<code>', methods=["DELETE"])
 def delete_board_by_code(member_id, code):
