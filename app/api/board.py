@@ -37,16 +37,18 @@ def add_default_properties(board):
 
     db.session.add(board)
 
-def generate_board_code(board):
     try:
-        board.id = db.session.execute(Sequence("boards_id_seq"))
-        board.code = base62.encode(hash(('boards', board.id)), 8)[-8:]
-
+        db.session.commit()
         return board
-
     except IntegrityError:
         db.session.rollback()
-        return generate_board_code(board)
+        return add_default_properties(board)
+
+def generate_board_code(board):
+    board.id = db.session.execute(Sequence("boards_id_seq"))
+    board.code = base62.encode(hash(('boards', board.id)), 8)[-8:]
+
+    return board
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["POST"])
 def create_board(member_id):
