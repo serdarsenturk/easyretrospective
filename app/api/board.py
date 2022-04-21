@@ -26,22 +26,16 @@ pusher = Pusher(
 )
 
 def add_default_properties(board):
-        generate_board_code(board)
+    generate_board_code(board)
 
-        date = datetime.now()
-        board.date = date
-        board.name = f"Retro {date.strftime('%d/%m/%y')}"
+    date = datetime.now()
+    board.date = date
+    board.name = f"Retro {date.strftime('%d/%m/%y')}"
 
-        columns = [Column(name = "What went well", board_id= board.id), Column(name = "What didn't go well ", board_id= board.id), Column(name = "To improve", board_id= board.id)]
-        board.columns = columns
+    columns = [Column(name = "What went well", board_id= board.id), Column(name = "What didn't go well ", board_id= board.id), Column(name = "To improve", board_id= board.id)]
+    board.columns = columns
 
-        try:
-            db.session.add(board)
-            db.session.commit()
-
-            return board
-        except:
-            db.session.rollback()
+    db.session.add(board)
 
 def generate_board_code(board):
     try:
