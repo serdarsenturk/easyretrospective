@@ -164,10 +164,23 @@ def get_member_boards(member_id):
 @boards.route('/api/v1/teams/<team_id>/boards', methods=["GET"])
 def get_team_boards(team_id):
     try:
-        team_boards = db.session.query(Team) \
-            .filter(Team.id == team_id) \
-            .all()
-
-        return jsonify(team_boards_schema.dump(team_boards))
+        member_id = request.headers.get('member_id')
     except:
-        db.session.rollback()
+        return '', 401
+
+    member = db.session.query(Member) \
+        .filter(Member.teams.any(Team.id == team_id)) \
+        .filter(Member.id == member_id) \
+        .first()
+
+    if not member:
+            return '', 404
+
+    team_boards = db.session.query(Board) \
+        .filter(Board.team_id == team_id) \
+        .filter(Board.member_id == member_id) \
+        .limit(10)
+
+    return jsonify(boards_schema.dump(team_boards)), 200
+
+@boards.route('/api/v1/members/<member_id>/teams', methods=["GET"])
