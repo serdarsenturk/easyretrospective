@@ -184,3 +184,15 @@ def get_team_boards(team_id):
     return jsonify(boards_schema.dump(team_boards)), 200
 
 @boards.route('/api/v1/members/<member_id>/teams', methods=["GET"])
+def get_teams(member_id):
+    member = db.session.query(Member) \
+        .filter(Member.id == member_id) \
+        .first()
+
+    if member:
+        try:
+            return jsonify(teams_schema.dump(member.teams))
+        except:
+            return 'Teams not found', 404
+    else:
+        return 'Forbidden', 403
