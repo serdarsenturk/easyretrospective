@@ -80,17 +80,24 @@ def create_board(member_id):
 
 @boards.route('/api/v1/members/<member_id>/boards/<code>', methods=["DELETE"])
 def delete_board_by_code(member_id, code):
-    board = db.session.query(Board) \
-        .filter(Board.code == code) \
-        .filter(Board.member_id == member_id) \
+    member = db.session.query(Member) \
+        .filter(Member.boards.any(Board.code == code)) \
+        .filter(Member.id == member_id) \
         .first()
 
-    db.session.delete(board)
+    if not member:
+        return '', 401
+
+    to_delete_board = db.session.query(Board) \
+        .filter(Board.code == code) \
+        .first()
+
+    db.session.delete(to_delete_board)
     db.session.commit()
 
-    pusher.trigger(f"member-{id}", "board-deleted", {"code": code, "member_id": id})
+    pusher.trigger(f"member-{member_id}", "board-deleted", {"code": code, "member_id": member_id})
 
-    return jsonify(board_schema.dump(board))
+    return 'Board deleted', 200
 
 @boards.route('/api/v1/boards/<code>', methods=["GET"])
 def get_board_by_code(code):
