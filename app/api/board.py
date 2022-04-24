@@ -138,11 +138,12 @@ def modify_board_name_by_code(member_id, code):
     try:
         db.session.commit()
 
-        pusher.trigger(f"member-{member_id}", "board-updated", {"code": code, "name": board.name})
+        pusher.trigger(f"member-{member_id}", "board-updated", {"code": code, "name": board.name, "date": board.date.__str__()})
 
-        return jsonify(board_schema.dump(board))
-    except:
+        return jsonify(board_schema.dump(board)), 201
+    except IntegrityError:
         db.session.rollback()
+        return '', 500
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["GET"])
 def get_member_boards(member_id):
