@@ -101,14 +101,21 @@ def delete_board_by_code(member_id, code):
 
 @boards.route('/api/v1/boards/<code>', methods=["GET"])
 def get_board_by_code(code):
-    try:
-        board = db.session.query(Board) \
-            .filter(Board.code == code) \
-            .first()
+    member_id = request.headers.get('member_id')
 
-        return jsonify(board_schema.dump(board))
-    except:
-        db.session.rollback()
+    member = db.session.query(Member) \
+        .filter(Member.boards.any(Board.code == code)) \
+        .filter(Member.id == member_id) \
+        .first()
+
+    if not member:
+        return '', 401
+
+    board = db.session.query(Board) \
+        .filter(Board.code == code) \
+        .first()
+
+    return jsonify(board_schema.dump(board))
 
 @boards.route('/api/v1/members/<member_id>/boards/<code>/name', methods=["PUT"])
 def modify_board_name_by_code(member_id, code):
