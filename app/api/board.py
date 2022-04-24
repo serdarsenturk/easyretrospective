@@ -8,6 +8,7 @@ from datetime import datetime
 import base62
 from app.schema.board import board_schema
 from app.schema.member_board import member_boards_schema
+from app.schema.team import teams_schema
 from app.models.board import Board
 from app.models.column import Column
 from app.models.member import Member
