@@ -119,6 +119,13 @@ def get_board_by_code(code):
 
 @boards.route('/api/v1/members/<member_id>/boards/<code>/name', methods=["PUT"])
 def modify_board_name_by_code(member_id, code):
+    member = db.session.query(Member) \
+        .filter(Member.id == member_id) \
+        .first()
+
+    if not member:
+        return '', 401
+
     board = db.session.query(Board) \
         .filter(Board.code == code) \
         .filter(Board.member_id == member_id) \
