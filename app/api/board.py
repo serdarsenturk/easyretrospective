@@ -147,14 +147,19 @@ def modify_board_name_by_code(member_id, code):
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["GET"])
 def get_member_boards(member_id):
-    try:
-        member_boards = db.session.query(Board) \
-            .filter(Board.member_id == member_id) \
-            .all()
-        return jsonify(member_boards_schema.dump(member_boards))
+    member = db.session.query(Member) \
+        .filter(Member.id == member_id) \
+        .first()
 
-    except:
-        db.session.rollback()
+    if not member:
+        return '', 401
+
+    member_boards = db.session.query(Board) \
+        .filter(Board.member_id == member_id) \
+        .filter(Board.team_id == None) \
+        .limit(10)
+
+    return jsonify(member_boards_schema.dump(member_boards))
 
 @boards.route('/api/v1/teams/<team_id>/boards', methods=["GET"])
 def get_team_boards(team_id):
