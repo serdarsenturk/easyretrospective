@@ -1,7 +1,7 @@
 from app import db, app
 from flask_cors import CORS
 from pusher import Pusher
-from sqlalchemy import Sequence
+from sqlalchemy import Sequence, desc
 from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, jsonify, request
 from datetime import datetime
@@ -157,7 +157,8 @@ def get_member_boards(member_id):
     member_boards = db.session.query(Board) \
         .filter(Board.member_id == member_id) \
         .filter(Board.team_id == None) \
-        .limit(10)
+        .order_by(desc(Board.date)) \
+        .limit(8)
 
     return jsonify(member_boards_schema.dump(member_boards))
 
@@ -179,7 +180,8 @@ def get_team_boards(team_id):
     team_boards = db.session.query(Board) \
         .filter(Board.team_id == team_id) \
         .filter(Board.member_id == member_id) \
-        .limit(10)
+        .order_by(desc(Board.date)) \
+        .limit(8)
 
     return jsonify(boards_schema.dump(team_boards)), 200
 
