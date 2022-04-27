@@ -76,7 +76,7 @@ def create_board(member_id):
         except Exception:
             return '', 400
     else:
-        return '', 401
+        return 'Please verify your identity', 401
 
 @boards.route('/api/v1/members/<member_id>/boards/<code>', methods=["DELETE"])
 def delete_board_by_code(member_id, code):
@@ -86,7 +86,7 @@ def delete_board_by_code(member_id, code):
         .first()
 
     if not member:
-        return '', 401
+        return 'Please verify your identity', 401
 
     to_delete_board = db.session.query(Board) \
         .filter(Board.code == code) \
@@ -109,7 +109,7 @@ def get_board_by_code(code):
         .first()
 
     if not member:
-        return '', 401
+        return 'Please verify your identity', 401
 
     board = db.session.query(Board) \
         .filter(Board.code == code) \
@@ -124,7 +124,7 @@ def modify_board_name_by_code(member_id, code):
         .first()
 
     if not member:
-        return '', 401
+        return 'Please verify your identity', 401
 
     board = db.session.query(Board) \
         .filter(Board.code == code) \
@@ -143,7 +143,7 @@ def modify_board_name_by_code(member_id, code):
         return jsonify(board_schema.dump(board)), 201
     except IntegrityError:
         db.session.rollback()
-        return '', 500
+        return 'Oops, an error occurred', 500
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["GET"])
 def get_member_boards(member_id):
@@ -152,7 +152,7 @@ def get_member_boards(member_id):
         .first()
 
     if not member:
-        return '', 401
+        return 'Please verify your identity', 401
 
     member_boards = db.session.query(Board) \
         .filter(Board.member_id == member_id) \
@@ -167,7 +167,7 @@ def get_team_boards(team_id):
     try:
         member_id = request.headers.get('member_id')
     except:
-        return '', 401
+        return 'Please verify your identity', 401
 
     member = db.session.query(Member) \
         .filter(Member.teams.any(Team.id == team_id)) \
@@ -175,7 +175,7 @@ def get_team_boards(team_id):
         .first()
 
     if not member:
-            return '', 404
+            return 'Member does not exists', 404
 
     team_boards = db.session.query(Board) \
         .filter(Board.team_id == team_id) \
@@ -197,4 +197,4 @@ def get_teams(member_id):
         except:
             return 'Teams not found', 404
     else:
-        return 'Forbidden', 403
+        return 'Please verify your identity', 401
