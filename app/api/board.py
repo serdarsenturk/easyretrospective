@@ -143,7 +143,7 @@ def modify_board_name_by_code(member_id, code):
         return jsonify(board_schema.dump(board)), 201
     except IntegrityError:
         db.session.rollback()
-        return 'Oops, an error occurred', 500
+        return 'Board name could not updated, try again.', 500
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["GET"])
 def get_member_boards(member_id):
