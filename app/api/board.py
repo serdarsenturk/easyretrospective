@@ -56,27 +56,27 @@ def create_board(member_id):
         .filter(Member.id == member_id) \
         .first()
 
-    if member:
+    if not member:
+        return 'Please verify your identity', 401
+
+    try:
         team_id = request.json["team_id"]
         temp_board = Board(member_id=member_id, team_id=team_id)
 
-        try:
-            new_board = add_default_properties(temp_board)
-            pusher.trigger(f"member-{member_id}", "board-created",
-                           {
-                               "code": new_board.code,
-                               "date": new_board.date.__str__(),
-                               "member_id": new_board.member_id,
-                               "name": new_board.name,
-                               "team_id": new_board.team_id,
-                           }
-                           )
+        new_board = add_default_properties(temp_board)
+        pusher.trigger(f"member-{member_id}", "board-created",
+                       {
+                           "code": new_board.code,
+                           "date": new_board.date.__str__(),
+                           "member_id": new_board.member_id,
+                           "name": new_board.name,
+                           "team_id": new_board.team_id,
+                       }
+                       )
 
-            return board_schema.dump(new_board), 201
-        except Exception:
-            return '', 400
-    else:
-        return 'Please verify your identity', 401
+        return board_schema.dump(new_board), 201
+    except Exception:
+        return 'Board creation failed, try again', 500
 
 @boards.route('/api/v1/members/<member_id>/boards/<code>', methods=["DELETE"])
 def delete_board_by_code(member_id, code):
