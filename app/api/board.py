@@ -88,11 +88,11 @@ def delete_board_by_code(member_id, code):
     if not member:
         return 'Please verify your identity', 401
 
-    to_delete_board = db.session.query(Board) \
+    board_to_delete = db.session.query(Board) \
         .filter(Board.code == code) \
         .first()
 
-    db.session.delete(to_delete_board)
+    db.session.delete(board_to_delete)
     db.session.commit()
 
     pusher.trigger(f"member-{member_id}", "board-deleted", {"code": code, "member_id": member_id})
