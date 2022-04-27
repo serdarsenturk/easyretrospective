@@ -191,10 +191,10 @@ def get_teams(member_id):
         .filter(Member.id == member_id) \
         .first()
 
-    if member:
-        try:
-            return jsonify(teams_schema.dump(member.teams))
-        except:
-            return 'Teams not found', 404
-    else:
-        return 'Please verify your identity', 401
+    if not member:
+        return '', 401
+
+    try:
+        return jsonify(teams_schema.dump(member.teams))
+    except:
+        return 'Teams not found', 404
