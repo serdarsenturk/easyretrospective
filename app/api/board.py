@@ -52,6 +52,11 @@ def generate_board_code(board):
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["POST"])
 def create_board(member_id):
+    uid = request.headers.get('member_id')
+
+    if member_id != uid:
+        return 'Please verify your identity', 401
+
     member = db.session.query(Member) \
         .filter(Member.id == member_id) \
         .first()
@@ -80,6 +85,11 @@ def create_board(member_id):
 
 @boards.route('/api/v1/members/<member_id>/boards/<code>', methods=["DELETE"])
 def delete_board_by_code(member_id, code):
+    uid = request.headers.get('uid')
+
+    if member_id != uid:
+        return 'Please verify your identity', 401
+
     member = db.session.query(Member) \
         .filter(Member.boards.any(Board.code == code)) \
         .filter(Member.id == member_id) \
@@ -101,7 +111,10 @@ def delete_board_by_code(member_id, code):
 
 @boards.route('/api/v1/boards/<code>', methods=["GET"])
 def get_board_by_code(code):
-    member_id = request.headers.get('member_id')
+    uid = request.headers.get('member_id')
+
+    if not uid:
+        return 'Please verify your identity', 401
 
     member = db.session.query(Member) \
         .filter(Member.boards.any(Board.code == code)) \
@@ -119,6 +132,11 @@ def get_board_by_code(code):
 
 @boards.route('/api/v1/members/<member_id>/boards/<code>/name', methods=["PUT"])
 def modify_board_name_by_code(member_id, code):
+    uid = request.headers.get('member_id')
+
+    if member_id != uid:
+        return 'Please verify your identity', 401
+
     member = db.session.query(Member) \
         .filter(Member.id == member_id) \
         .first()
@@ -147,6 +165,11 @@ def modify_board_name_by_code(member_id, code):
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["GET"])
 def get_member_boards(member_id):
+    uid = request.headers.get('member_id')
+
+    if member_id != uid:
+        return 'Please verify your identity', 401
+
     member = db.session.query(Member) \
         .filter(Member.id == member_id) \
         .first()
@@ -187,6 +210,11 @@ def get_team_boards(team_id):
 
 @boards.route('/api/v1/members/<member_id>/teams', methods=["GET"])
 def get_teams(member_id):
+    uid = request.headers.get('member_id')
+
+    if member_id != uid:
+        return 'Access denied due to unauthorized request', 401
+
     member = db.session.query(Member) \
         .filter(Member.id == member_id) \
         .first()
