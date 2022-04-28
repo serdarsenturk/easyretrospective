@@ -202,7 +202,7 @@ def get_team_boards(team_id):
 
     team_boards = db.session.query(Board) \
         .filter(Board.team_id == team_id) \
-        .filter(Board.member_id == member_id) \
+        .filter(Board.member_id == uid) \
         .order_by(desc(Board.date)) \
         .limit(8)
 
