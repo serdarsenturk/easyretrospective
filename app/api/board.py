@@ -187,14 +187,14 @@ def get_member_boards(member_id):
 
 @boards.route('/api/v1/teams/<team_id>/boards', methods=["GET"])
 def get_team_boards(team_id):
-    try:
-        member_id = request.headers.get('member_id')
-    except:
+    uid = request.headers.get('member_id')
+
+    if not uid:
         return 'Please verify your identity', 401
 
     member = db.session.query(Member) \
         .filter(Member.teams.any(Team.id == team_id)) \
-        .filter(Member.id == member_id) \
+        .filter(Member.id == uid) \
         .first()
 
     if not member:
