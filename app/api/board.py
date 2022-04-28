@@ -171,6 +171,7 @@ def get_member_boards(member_id):
         return 'Please verify your identity', 401
 
     member = db.session.query(Member) \
+        .filter(Member.boards.any(Board.member_id == member_id)) \
         .filter(Member.id == member_id) \
         .first()
 
