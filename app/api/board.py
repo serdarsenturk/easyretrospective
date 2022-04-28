@@ -62,7 +62,7 @@ def create_board(member_id):
         .first()
 
     if not member:
-        return 'Please verify your identity', 401
+        return 'Member does not exist', 401
 
     try:
         team_id = request.json["team_id"]
@@ -96,7 +96,7 @@ def delete_board_by_code(member_id, code):
         .first()
 
     if not member:
-        return 'Please verify your identity', 401
+        return 'Member does not exist', 404
 
     board_to_delete = db.session.query(Board) \
         .filter(Board.code == code) \
@@ -118,11 +118,11 @@ def get_board_by_code(code):
 
     member = db.session.query(Member) \
         .filter(Member.boards.any(Board.code == code)) \
-        .filter(Member.id == member_id) \
+        .filter(Member.id == uid) \
         .first()
 
     if not member:
-        return 'Please verify your identity', 401
+        return 'Member does not exist', 404
 
     board = db.session.query(Board) \
         .filter(Board.code == code) \
@@ -142,7 +142,7 @@ def modify_board_name_by_code(member_id, code):
         .first()
 
     if not member:
-        return 'Please verify your identity', 401
+        return 'Member does not exist', 404
 
     board = db.session.query(Board) \
         .filter(Board.code == code) \
@@ -176,7 +176,7 @@ def get_member_boards(member_id):
         .first()
 
     if not member:
-        return 'Please verify your identity', 401
+        return 'Member does not exist', 404
 
     member_boards = db.session.query(Board) \
         .filter(Board.member_id == member_id) \
@@ -221,9 +221,9 @@ def get_teams(member_id):
         .first()
 
     if not member:
-        return '', 401
+        return 'User does not exist', 404
 
     try:
         return jsonify(teams_schema.dump(member.teams))
     except:
-        return 'Teams not found', 404
+        return 'User"s team not found', 404
