@@ -21,6 +21,11 @@ pusher = Pusher(
 
 @cards.route('', methods=["POST"])
 def create_card(member_id, code, column_id):
+    requester_id = request.headers.get('member_id')
+
+    if member_id != requester_id:
+        return 'Unauthorized request', 401
+
     content = request.json['content']
 
     new_card = Card(content = content, member_id = member_id, column_id = column_id)
@@ -37,6 +42,11 @@ def create_card(member_id, code, column_id):
 
 @cards.route('<card_id>', methods=["DELETE"])
 def delete_card_by_id(member_id, code, column_id, card_id):
+    requester_id = request.headers.get('member_id')
+
+    if member_id != requester_id:
+        return 'Unauthorized request', 401
+
     card = db.session.query(Card) \
         .filter(Card.id == card_id) \
         .filter(Column.id == column_id) \
@@ -57,6 +67,11 @@ def delete_card_by_id(member_id, code, column_id, card_id):
 
 @cards.route('<card_id>/content', methods=["PUT"])
 def modify_card_content_by_id(member_id, code, column_id, card_id):
+    requester_id = request.headers.get('member_id')
+
+    if member_id != requester_id:
+        return 'Unauthorized request', 401
+
     card = db.session.query(Card) \
         .filter(Card.id == card_id) \
         .filter(Column.id == column_id) \

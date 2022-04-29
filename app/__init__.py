@@ -5,7 +5,6 @@ from flask_sqlalchemy import SQLAlchemy
 from config import Config
 
 #Define the WSGI application object
-
 app = Flask(__name__)
 ma = Marshmallow(app)
 
