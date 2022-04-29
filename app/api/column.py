@@ -20,10 +20,10 @@ pusher = Pusher(
 
 @columns.route('', methods=["POST"])
 def create_column(member_id, code):
-    uid = request.headers.get('member_id')
+    requester_id = request.headers.get('member_id')
 
-    if member_id != uid:
-        return 'Wrong UID, please verify your identity to complete this method', 401
+    if member_id != requester_id:
+        return 'Unauthorized request', 401
 
     name = request.json['name']
 
@@ -48,10 +48,10 @@ def create_column(member_id, code):
 
 @columns.route('<column_id>', methods=['DELETE'])
 def delete_column_by_id(member_id, code, column_id):
-    uid = request.headers.get('member_id')
+    requester_id = request.headers.get('member_id')
 
-    if member_id != uid:
-        return 'Wrong UID, please verify your identity to complete this method', 401
+    if member_id != requester_id:
+        return 'Unauthorized request', 401
 
     column = db.session.query(Column) \
         .filter(Board.code == code ) \
@@ -72,10 +72,10 @@ def delete_column_by_id(member_id, code, column_id):
 
 @columns.route('<column_id>/name', methods=['PUT'])
 def modify_column_by_id(member_id, code, column_id):
-    uid = request.headers.get('member_id')
+    requester_id = request.headers.get('member_id')
 
-    if member_id != uid:
-        return 'Wrong UID, please verify your identity to complete this method', 401
+    if member_id != requester_id:
+        return 'Unauthorized request', 401
 
     column = db.session.query(Column) \
         .filter(Board.code == code ) \

@@ -21,10 +21,10 @@ pusher = Pusher(
 
 @cards.route('', methods=["POST"])
 def create_card(member_id, code, column_id):
-    uid = request.headers.get('member_id')
+    requester_id = request.headers.get('member_id')
 
-    if member_id != uid:
-        return 'Wrong UID, please verify your identity to complete this method', 401
+    if member_id != requester_id:
+        return 'Unauthorized request', 401
 
     content = request.json['content']
 
@@ -42,10 +42,10 @@ def create_card(member_id, code, column_id):
 
 @cards.route('<card_id>', methods=["DELETE"])
 def delete_card_by_id(member_id, code, column_id, card_id):
-    uid = request.headers.get('member_id')
+    requester_id = request.headers.get('member_id')
 
-    if member_id != uid:
-        return 'Wrong UID, please verify your identity to complete this method', 401
+    if member_id != requester_id:
+        return 'Unauthorized request', 401
 
     card = db.session.query(Card) \
         .filter(Card.id == card_id) \
@@ -67,10 +67,10 @@ def delete_card_by_id(member_id, code, column_id, card_id):
 
 @cards.route('<card_id>/content', methods=["PUT"])
 def modify_card_content_by_id(member_id, code, column_id, card_id):
-    uid = request.headers.get('member_id')
+    requester_id = request.headers.get('member_id')
 
-    if member_id != uid:
-        return 'Wrong UID, please verify your identity to complete this method', 401
+    if member_id != requester_id:
+        return 'Unauthorized request', 401
 
     card = db.session.query(Card) \
         .filter(Card.id == card_id) \

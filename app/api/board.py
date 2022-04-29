@@ -52,17 +52,17 @@ def generate_board_code(board):
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["POST"])
 def create_board(member_id):
-    uid = request.headers.get('member_id')
+    requester_id = request.headers.get('member_id')
 
-    if member_id != uid:
-        return 'Please verify your identity', 401
+    if member_id != requester_id:
+        return 'Unauthorized request', 401
 
     member = db.session.query(Member) \
         .filter(Member.id == member_id) \
         .first()
 
     if not member:
-        return 'Member does not exist', 401
+        return 'Unauthorized request', 401
 
     try:
         team_id = request.json["team_id"]
@@ -85,10 +85,10 @@ def create_board(member_id):
 
 @boards.route('/api/v1/members/<member_id>/boards/<code>', methods=["DELETE"])
 def delete_board_by_code(member_id, code):
-    uid = request.headers.get('uid')
+    requester_id = request.headers.get('member_id')
 
-    if member_id != uid:
-        return 'Please verify your identity', 401
+    if member_id != requester_id:
+        return 'Unauthorized request', 401
 
     member = db.session.query(Member) \
         .filter(Member.boards.any(Board.code == code)) \
@@ -111,14 +111,14 @@ def delete_board_by_code(member_id, code):
 
 @boards.route('/api/v1/boards/<code>', methods=["GET"])
 def get_board_by_code(code):
-    uid = request.headers.get('member_id')
+    requester_id = request.headers.get('member_id')
 
-    if not uid:
-        return 'Please verify your identity', 401
+    if not requester_id:
+        return 'Unauthorized request', 401
 
     member = db.session.query(Member) \
         .filter(Member.boards.any(Board.code == code)) \
-        .filter(Member.id == uid) \
+        .filter(Member.id == requester_id) \
         .first()
 
     if not member:
@@ -132,10 +132,10 @@ def get_board_by_code(code):
 
 @boards.route('/api/v1/members/<member_id>/boards/<code>/name', methods=["PUT"])
 def modify_board_name_by_code(member_id, code):
-    uid = request.headers.get('member_id')
+    requester_id = request.headers.get('member_id')
 
-    if member_id != uid:
-        return 'Please verify your identity', 401
+    if member_id != requester_id:
+        return 'Unauthorized request', 401
 
     member = db.session.query(Member) \
         .filter(Member.id == member_id) \
@@ -165,10 +165,10 @@ def modify_board_name_by_code(member_id, code):
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["GET"])
 def get_member_boards(member_id):
-    uid = request.headers.get('member_id')
+    requester_id = request.headers.get('member_id')
 
-    if member_id != uid:
-        return 'Please verify your identity', 401
+    if member_id != requester_id:
+        return 'Unauthorized request', 401
 
     member = db.session.query(Member) \
         .filter(Member.boards.any(Board.member_id == member_id)) \
@@ -188,14 +188,14 @@ def get_member_boards(member_id):
 
 @boards.route('/api/v1/teams/<team_id>/boards', methods=["GET"])
 def get_team_boards(team_id):
-    uid = request.headers.get('member_id')
+    requester_id = request.headers.get('member_id')
 
-    if not uid:
-        return 'Please verify your identity', 401
+    if not requester_id:
+        return 'Unauthorized request', 401
 
     member = db.session.query(Member) \
         .filter(Member.teams.any(Team.id == team_id)) \
-        .filter(Member.id == uid) \
+        .filter(Member.id == requester_id) \
         .first()
 
     if not member:
@@ -203,7 +203,7 @@ def get_team_boards(team_id):
 
     team_boards = db.session.query(Board) \
         .filter(Board.team_id == team_id) \
-        .filter(Board.member_id == uid) \
+        .filter(Board.member_id == requester_id) \
         .order_by(desc(Board.date)) \
         .limit(8)
 
@@ -211,10 +211,10 @@ def get_team_boards(team_id):
 
 @boards.route('/api/v1/members/<member_id>/teams', methods=["GET"])
 def get_teams(member_id):
-    uid = request.headers.get('member_id')
+    requester_id = request.headers.get('member_id')
 
-    if member_id != uid:
-        return 'Access denied due to unauthorized request', 401
+    if member_id != requester_id:
+        return 'Unauthorized request', 401
 
     member = db.session.query(Member) \
         .filter(Member.id == member_id) \
