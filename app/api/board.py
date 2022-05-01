@@ -1,3 +1,5 @@
+import logging
+
 from app import db, app
 from flask_cors import CORS
 from pusher import Pusher
@@ -52,7 +54,7 @@ def generate_board_code(board):
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["POST"])
 def create_board(member_id):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
@@ -85,7 +87,7 @@ def create_board(member_id):
 
 @boards.route('/api/v1/members/<member_id>/boards/<code>', methods=["DELETE"])
 def delete_board_by_code(member_id, code):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
@@ -111,7 +113,7 @@ def delete_board_by_code(member_id, code):
 
 @boards.route('/api/v1/boards/<code>', methods=["GET"])
 def get_board_by_code(code):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if not requester_id:
         return 'Unauthorized request', 401
@@ -132,7 +134,7 @@ def get_board_by_code(code):
 
 @boards.route('/api/v1/members/<member_id>/boards/<code>/name', methods=["PUT"])
 def modify_board_name_by_code(member_id, code):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
@@ -165,10 +167,11 @@ def modify_board_name_by_code(member_id, code):
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["GET"])
 def get_member_boards(member_id):
-    requester_id = request.headers.get('member_id')
+    # requester_id = request.cookies.get("member_id")
+    # requester_id = request.headers.get('member_id')
 
-    if member_id != requester_id:
-        return 'Unauthorized request', 401
+    # if member_id != requester_id:
+    #     return 'Unauthorized request', 401
 
     member = db.session.query(Member) \
         .filter(Member.boards.any(Board.member_id == member_id)) \
@@ -188,7 +191,7 @@ def get_member_boards(member_id):
 
 @boards.route('/api/v1/teams/<team_id>/boards', methods=["GET"])
 def get_team_boards(team_id):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if not requester_id:
         return 'Unauthorized request', 401
@@ -211,10 +214,11 @@ def get_team_boards(team_id):
 
 @boards.route('/api/v1/members/<member_id>/teams', methods=["GET"])
 def get_teams(member_id):
-    requester_id = request.headers.get('member_id')
+    # requester_id = request.cookies.get('member_id')
+    # requester_id = request.headers.get('member_id')
 
-    if member_id != requester_id:
-        return 'Unauthorized request', 401
+    # if member_id != requester_id:
+    #     return 'Unauthorized request', 401
 
     member = db.session.query(Member) \
         .filter(Member.id == member_id) \

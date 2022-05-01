@@ -21,7 +21,7 @@ pusher = Pusher(
 
 @cards.route('', methods=["POST"])
 def create_card(member_id, code, column_id):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
@@ -42,7 +42,7 @@ def create_card(member_id, code, column_id):
 
 @cards.route('<card_id>', methods=["DELETE"])
 def delete_card_by_id(member_id, code, column_id, card_id):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
@@ -67,7 +67,7 @@ def delete_card_by_id(member_id, code, column_id, card_id):
 
 @cards.route('<card_id>/content', methods=["PUT"])
 def modify_card_content_by_id(member_id, code, column_id, card_id):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if member_id != requester_id:
         return 'Unauthorized request', 401

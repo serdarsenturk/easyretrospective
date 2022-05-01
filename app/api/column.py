@@ -20,7 +20,7 @@ pusher = Pusher(
 
 @columns.route('', methods=["POST"])
 def create_column(member_id, code):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
@@ -48,7 +48,7 @@ def create_column(member_id, code):
 
 @columns.route('<column_id>', methods=['DELETE'])
 def delete_column_by_id(member_id, code, column_id):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
@@ -72,7 +72,7 @@ def delete_column_by_id(member_id, code, column_id):
 
 @columns.route('<column_id>/name', methods=['PUT'])
 def modify_column_by_id(member_id, code, column_id):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
