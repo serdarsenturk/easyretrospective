@@ -17,7 +17,7 @@ from app.models.member import Member
 from app.models.team import Team
 
 boards = Blueprint('boards', __name__)
-CORS(boards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
+CORS(boards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}}, supports_credentials=True)
 
 pusher = Pusher(
     app_id=app.config.get('PUSHER_APP_ID'),
