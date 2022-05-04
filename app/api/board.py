@@ -167,11 +167,10 @@ def modify_board_name_by_code(member_id, code):
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["GET"])
 def get_member_boards(member_id):
-    # requester_id = request.cookies.get("member_id")
-    # requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
-    # if member_id != requester_id:
-    #     return 'Unauthorized request', 401
+    if member_id != requester_id:
+        return 'Unauthorized request', 401
 
     member = db.session.query(Member) \
         .filter(Member.boards.any(Board.member_id == member_id)) \
@@ -214,11 +213,10 @@ def get_team_boards(team_id):
 
 @boards.route('/api/v1/members/<member_id>/teams', methods=["GET"])
 def get_teams(member_id):
-    # requester_id = request.cookies.get('member_id')
-    # requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
-    # if member_id != requester_id:
-    #     return 'Unauthorized request', 401
+    if member_id != requester_id:
+        return 'Unauthorized request', 401
 
     member = db.session.query(Member) \
         .filter(Member.id == member_id) \
