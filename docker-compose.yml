@@ -3,6 +3,48 @@ version: '3.8'
 services: 
   api:
     build: .
-    ports: 
+    ports:
       - 5000:5000
+    expose:
+      - 5000
     restart: always
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    depends_on:
+      - database
+
+  database:
+    privileged: true
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: easyretrospective
+    env_file: .env
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    expose:
+      - 5432
+    volumes:
+      - ~/dockerdata/postgresql:/var/lib/postgresql/data
+    restart: always
+
+  frontend:
+    ports:
+      - 3000:3000
+    build:
+      context: ../easyretrospective-frontend
+    environment:
+      BACKEND_URL: http://api:5000
+      NEXT_PUBLIC_BACKEND_URL: http://localhost:5000
+    env_file:
+      - ../easyretrospective-frontend/.env
+    command: npm run dev
+    volumes:
+      - ../easyretrospective-frontend:/usr/src
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
+    depends_on:
+      - database

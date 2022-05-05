@@ -9,7 +9,7 @@ from app.schema.card import card_schema
 from pusher import Pusher
 
 cards = Blueprint('cards', __name__, url_prefix='/api/v1/members/<member_id>/boards/<code>/columns/<column_id>/cards')
-CORS(cards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
+CORS(cards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}}, supports_credentials=True)
 
 pusher = Pusher(
     app_id=app.config.get('PUSHER_APP_ID'),
@@ -21,7 +21,7 @@ pusher = Pusher(
 
 @cards.route('', methods=["POST"])
 def create_card(member_id, code, column_id):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
@@ -42,7 +42,7 @@ def create_card(member_id, code, column_id):
 
 @cards.route('<card_id>', methods=["DELETE"])
 def delete_card_by_id(member_id, code, column_id, card_id):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
@@ -67,7 +67,7 @@ def delete_card_by_id(member_id, code, column_id, card_id):
 
 @cards.route('<card_id>/content', methods=["PUT"])
 def modify_card_content_by_id(member_id, code, column_id, card_id):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if member_id != requester_id:
         return 'Unauthorized request', 401

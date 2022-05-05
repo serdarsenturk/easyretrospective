@@ -8,7 +8,7 @@ from app.schema.column import column_schema
 from app.schema.column_updated import column_updated_schema
 
 columns = Blueprint('columns', __name__, url_prefix='/api/v1/members/<member_id>/boards/<code>/columns')
-CORS(columns, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
+CORS(columns, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}}, supports_credentials=True)
 
 pusher = Pusher(
     app_id=app.config.get('PUSHER_APP_ID'),
@@ -20,7 +20,7 @@ pusher = Pusher(
 
 @columns.route('', methods=["POST"])
 def create_column(member_id, code):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
@@ -48,7 +48,7 @@ def create_column(member_id, code):
 
 @columns.route('<column_id>', methods=['DELETE'])
 def delete_column_by_id(member_id, code, column_id):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
@@ -72,7 +72,7 @@ def delete_column_by_id(member_id, code, column_id):
 
 @columns.route('<column_id>/name', methods=['PUT'])
 def modify_column_by_id(member_id, code, column_id):
-    requester_id = request.headers.get('member_id')
+    requester_id = request.cookies.get('member_id')
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
