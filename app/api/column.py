@@ -8,7 +8,7 @@ from app.schema.column import column_schema
 from app.schema.column_updated import column_updated_schema
 
 columns = Blueprint('columns', __name__, url_prefix='/api/v1/members/<member_id>/boards/<code>/columns')
-CORS(columns, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
+CORS(columns, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}}, supports_credentials=True)
 
 pusher = Pusher(
     app_id=app.config.get('PUSHER_APP_ID'),

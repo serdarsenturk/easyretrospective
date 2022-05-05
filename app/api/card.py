@@ -9,7 +9,7 @@ from app.schema.card import card_schema
 from pusher import Pusher
 
 cards = Blueprint('cards', __name__, url_prefix='/api/v1/members/<member_id>/boards/<code>/columns/<column_id>/cards')
-CORS(cards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}})
+CORS(cards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}}, supports_credentials=True)
 
 pusher = Pusher(
     app_id=app.config.get('PUSHER_APP_ID'),
