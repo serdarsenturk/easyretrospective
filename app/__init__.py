@@ -22,6 +22,11 @@ cert = {
     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
     "client_x509_cert_url": app.config.get("CLIENT_X509_CERT_URL"),
 }
+app.config["FIREBASE_ADMIN_CREDENTIAL"] = credentials.Certificate(cert)
+app.config["FIREBASE_ADMIN_AUTHORIZATION_SCHEME"] = "JWT"
+app.config["FIREBASE_ADMIN_CHECK_REVOKED"] = False  # don't check for revoked tokens
+app.config["FIREBASE_ADMIN_PAYLOAD_ATTR"] = "firebase_jwt"
+app.config["FIREBASE_ADMIN_RAISE_IF_APP_EXISTS"] = False
 
 #Define the database object which is imported
 db = SQLAlchemy(app)
