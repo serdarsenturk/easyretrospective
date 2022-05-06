@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from firebase_admin import credentials
+from flask_firebase_admin import FirebaseAdmin
 
 #Define the WSGI application object
 app = Flask(__name__)
