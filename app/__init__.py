@@ -28,9 +28,10 @@ app.config["FIREBASE_ADMIN_CHECK_REVOKED"] = False  # don't check for revoked to
 app.config["FIREBASE_ADMIN_PAYLOAD_ATTR"] = "firebase_jwt"
 app.config["FIREBASE_ADMIN_RAISE_IF_APP_EXISTS"] = False
 
-#Define the database object which is imported
+# Initialize 3rd party applications
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+firebase = FirebaseAdmin(app)
 
 # Import a module / component using its blueprint handler variable (ex./url)
 from app.api.home import home
