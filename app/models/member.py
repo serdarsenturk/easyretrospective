@@ -20,3 +20,4 @@ class Member(db.Model):
     cards = db.relationship('Card', backref='card', lazy=True)
     teams = db.relationship('Team', secondary=teams_members, lazy='subquery',
         backref=db.backref('Member', lazy=True))
+    role = db.Column(db.Enum(Role))
