@@ -1,3 +1,4 @@
+authenticate = Blueprint('authenticate', __name__)
 @authenticate.route('/api/v1/member/login', methods=['POST'])
 def session_login():
     id_token = request.headers["authorization"]
