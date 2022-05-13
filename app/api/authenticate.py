@@ -1,4 +1,5 @@
 authenticate = Blueprint('authenticate', __name__)
+CORS(authenticate, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}}, supports_credentials=True)
 @authenticate.route('/api/v1/member/login', methods=['POST'])
 def session_login():
     id_token = request.headers["authorization"]
