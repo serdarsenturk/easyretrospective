@@ -1,4 +1,10 @@
 from app import db
+import enum
+
+class Role(enum.Enum):
+    MEMBER = "Member"
+    TEAMMEMBER = "TeamMember"
+    TEAMMANGER = "TeamManager"
 
 class Member(db.Model):
     __tablename__ = 'members'
