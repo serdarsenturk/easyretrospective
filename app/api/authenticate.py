@@ -19,3 +19,8 @@ def session_login():
     except exceptions.FirebaseError:
         return 'Failed to create a session cookie'
 
+@authenticate.route('/api/v1/member/logout', methods=['POST'])
+def session_logout():
+    response = make_response("Cookie Removed")
+    response.set_cookie('session', expires=0)
+    return response
