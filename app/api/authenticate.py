@@ -1,3 +1,4 @@
+from app import app, db
 from flask import Blueprint, request, jsonify, make_response
 from firebase_admin import auth, exceptions
 from flask_cors import CORS
