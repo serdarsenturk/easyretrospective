@@ -40,11 +40,13 @@ from app.api.home import home
 from app.api.board import boards
 from app.api.column import columns
 from app.api.card import cards
+from app.api.authenticate import authenticate
 
 #Register blueprint(s)
 app.register_blueprint(home)
 app.register_blueprint(boards)
 app.register_blueprint(columns)
 app.register_blueprint(cards)
+app.register_blueprint(authenticate)
 
 db.create_all()
