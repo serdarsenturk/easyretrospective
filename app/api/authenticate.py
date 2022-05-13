@@ -1,4 +1,5 @@
 from firebase_admin import auth, exceptions
+from flask_cors import CORS
 import datetime
 import time
 from app.models.member import Member, Role
