@@ -1,3 +1,4 @@
+from firebase_admin import auth, exceptions
 import datetime
 import time
 from app.models.member import Member, Role
