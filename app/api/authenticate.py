@@ -8,6 +8,26 @@ from app.models.member import Member, Role
 
 authenticate = Blueprint('authenticate', __name__)
 CORS(authenticate, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}}, supports_credentials=True)
+
+@authenticate.route('/api/v1/member/create')
+def create_member():
+    id_token = request.headers['authorization']
+
+    try:
+        decoded_claims = auth.verify_id_token(id_token)
+
+        new_member = Member(firebase_user_id=decoded_claims['user_id'],
+                            email=decoded_claims['email'],
+                            role=Role.MEMBER)
+
+        db.session.add(new_member)
+        db.session.commit()
+        
+        return 'Successful, a new member has created', 200
+    except:
+        db.session.rollback()
+        return 'Failed to create a new member', 401
+
 @authenticate.route('/api/v1/member/login', methods=['POST'])
 def session_login():
     id_token = request.headers["authorization"]
