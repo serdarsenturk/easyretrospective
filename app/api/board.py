@@ -1,5 +1,3 @@
-import logging
-
 from app import db, app
 from flask_cors import CORS
 from pusher import Pusher
