@@ -1,10 +1,4 @@
 from app import db
-import enum
-
-class Role(enum.Enum):
-    MEMBER = "Member"
-    TEAMMEMBER = "TeamMember"
-    TEAMMANGER = "TeamManager"
 
 class Member(db.Model):
     __tablename__ = 'members'
@@ -20,4 +14,5 @@ class Member(db.Model):
     cards = db.relationship('Card', backref='card', lazy=True)
     teams = db.relationship('Team', secondary=teams_members, lazy='subquery',
         backref=db.backref('Member', lazy=True))
-    role = db.Column(db.Enum(Role))
+    role = db.Column(db.Enum("Member", "TeamMember", "TeamManager", name="Role"))
+    db.UniqueConstraint(firebase_user_id)

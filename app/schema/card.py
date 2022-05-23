@@ -4,7 +4,7 @@ from app import ma
 class CardSchema(ma.SQLAlchemyAutoSchema):
     id = fields.Int()
     content = fields.Str()
-    member_id = fields.Int()
+    member_firebase_id = fields.Str()
     column_id = fields.Int()
 
 card_schema = CardSchema()
