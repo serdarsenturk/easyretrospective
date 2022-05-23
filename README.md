@@ -20,8 +20,9 @@ source venv/bin/activate
 # deactivate venv
 source venv/bin/deactivate
 
-# install flask and gunicorn
+# install flask, gunicorn and pipenv
 pip3 install flask gunicorn
+pip3 install pipenv
 
 # added to new libraries to requirements.txt was installed
 pip3 freeze > requirements.txt
