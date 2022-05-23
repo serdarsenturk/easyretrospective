@@ -1,14 +1,7 @@
-# Easyretrospective
-An easy retrospective tool.
+Free, easy and reliable retrospective tool application.
 
-# How to set up Python development environment
-
-```
-mkdir easyretrospective
-cd easyretrospective
-```
-
-### `Flask Setup:`
+****
+### `Flask Setup`
 ```bash
 
 # create virtual environment instance
@@ -34,13 +27,13 @@ $ pipenv install -r requirements.txt
 $ pip3 install -r requirements.txt
 
 ```
-
-#### Start to Flask app following commands:
+#### Start to Flask app following commands
 ```bash
 $ flask run
 ```
+****
 
-### `Flask-PostgreSQL Setup:`
+### `Flask-PostgreSQL Setup`
 
 #### For a postgresql use:
 
@@ -71,8 +64,9 @@ docker exec -t postgres-docker psql -U postgres -c "GRANT ALL PRIVILEGES ON DATA
 # If you are using default network when u entered `docker-compose up` command you have to use `172.17.0.1` host in DB_CONNECTION_STRING
 
 ```
+****
 
-#### To run the easyretrospective on docker and build python app image:
+### `Docker Deployment`
 
 ```bash
 
@@ -104,9 +98,9 @@ $ docker-compose build
 $ docker-compose up
 
 ```
+****
 
 ### `Alembic Setup:`
-
 Alembic environment settings:
 ```
 export DB_CONNECTION_STRING=postgresql://postgres:mysecretpassword@0.0.0.0:5432/easyretrospective
@@ -126,4 +120,15 @@ $ flask db migrate
 Upgrade to a later version
 $ flask db upgrade
 ```
+****
 
+### `Firebase-Admin Certificate example`
+```bash
+
+```
+****
+
+### `Heroku Deployment`
+
+```bash
+```
