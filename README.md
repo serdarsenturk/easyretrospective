@@ -8,41 +8,41 @@ mkdir easyretrospective
 cd easyretrospective
 ```
 
-###`Flask Setup:`
+### `Flask Setup:`
 ```bash
 
 # create virtual environment instance
-python3 -m venv venv
+$ python3 -m venv venv
 
 # active venv
-source venv/bin/activate
+$ source venv/bin/activate
 
 # deactivate venv
-source venv/bin/deactivate
+$ source venv/bin/deactivate
 
 # install flask, gunicorn and pipenv
-pip3 install flask gunicorn
-pip3 install pipenv
+$ pip3 install flask gunicorn
+$ pip3 install pipenv
 
 # added to new libraries to requirements.txt was installed
-pip3 freeze > requirements.txt
+$ pip3 freeze > requirements.txt
 
 # create Procfile and Pipfile.lock
-pipenv install -r requirements.txt
+$ pipenv install -r requirements.txt
 
 # install all libraries in requirements.txt
-pip3 install -r requirements.txt
+$ pip3 install -r requirements.txt
 
 ```
 
-####Start to Flask app following commands:
+#### Start to Flask app following commands:
 ```bash
-flask run
+$ flask run
 ```
 
-###`Flask-PostgreSQL Setup:`
+### `Flask-PostgreSQL Setup:`
 
-####For a postgresql use:
+#### For a postgresql use:
 
 ```bash
 
@@ -72,7 +72,7 @@ docker exec -t postgres-docker psql -U postgres -c "GRANT ALL PRIVILEGES ON DATA
 
 ```
 
-####To run the easyretrospective on docker and build python app image:
+#### To run the easyretrospective on docker and build python app image:
 
 ```bash
 
@@ -98,21 +98,21 @@ $ docker run --publish 8000:5000 <imageName>
 $ docker run -d -p 8000:5000 <imageName> <containerId>
 
 # Build docker-compose.yml
-docker-compose build
+$ docker-compose build
 
 # Compose docker-compose.yml
-docker-compose up
+$ docker-compose up
 
 ```
 
-###`Alembic Setup:`
+### `Alembic Setup:`
 
 Alembic environment settings:
 ```
 export DB_CONNECTION_STRING=postgresql://postgres:mysecretpassword@0.0.0.0:5432/easyretrospective
 ```
 
-####Alembic commands
+#### Alembic commands
 ```bash
 Initialize flask-alembic
 $ flask db init
