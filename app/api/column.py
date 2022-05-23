@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import CORS
 from pusher import Pusher
+from firebase_admin import auth
 from app import db, app
 from app.models.board import Board
 from app.models.column import Column
@@ -20,7 +21,9 @@ pusher = Pusher(
 
 @columns.route('', methods=["POST"])
 def create_column(member_id, code):
-    requester_id = request.cookies.get('member_id')
+    id_token = request.headers['Authorization']
+    decoded_token = auth.verify_id_token(id_token)
+    requester_id = decoded_token['user_id']
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
@@ -29,7 +32,7 @@ def create_column(member_id, code):
 
     board = db.session.query(Board) \
         .filter(Board.code == code) \
-        .filter(Board.member_id == member_id) \
+        .filter(Board.member_firebase_id == requester_id) \
         .first()
 
     board_id = board.id
@@ -48,14 +51,16 @@ def create_column(member_id, code):
 
 @columns.route('<column_id>', methods=['DELETE'])
 def delete_column_by_id(member_id, code, column_id):
-    requester_id = request.cookies.get('member_id')
+    id_token = request.headers['Authorization']
+    decoded_token = auth.verify_id_token(id_token)
+    requester_id = decoded_token['user_id']
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
 
     column = db.session.query(Column) \
         .filter(Board.code == code ) \
-        .filter(Board.member_id == member_id) \
+        .filter(Board.member_firebase_id == requester_id) \
         .filter(Column.id == column_id) \
         .first()
 
@@ -72,14 +77,16 @@ def delete_column_by_id(member_id, code, column_id):
 
 @columns.route('<column_id>/name', methods=['PUT'])
 def modify_column_by_id(member_id, code, column_id):
-    requester_id = request.cookies.get('member_id')
+    id_token = request.headers['Authorization']
+    decoded_token = auth.verify_id_token(id_token)
+    requester_id = decoded_token['user_id']
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
 
     column = db.session.query(Column) \
         .filter(Board.code == code ) \
-        .filter(Board.member_id == member_id) \
+        .filter(Board.member_firebase_id == requester_id) \
         .filter(Column.id == column_id) \
         .first()
 

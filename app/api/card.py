@@ -7,6 +7,7 @@ from app.models.column import Column
 from app.models.member import Member
 from app.schema.card import card_schema
 from pusher import Pusher
+from firebase_admin import auth
 
 cards = Blueprint('cards', __name__, url_prefix='/api/v1/members/<member_id>/boards/<code>/columns/<column_id>/cards')
 CORS(cards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}}, supports_credentials=True)
@@ -21,20 +22,22 @@ pusher = Pusher(
 
 @cards.route('', methods=["POST"])
 def create_card(member_id, code, column_id):
-    requester_id = request.cookies.get('member_id')
+    id_token = request.headers['Authorization']
+    decoded_token = auth.verify_id_token(id_token)
+    requester_id = decoded_token['user_id']
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
 
     content = request.json['content']
 
-    new_card = Card(content = content, member_id = member_id, column_id = column_id)
+    new_card = Card(content = content, member_firebase_id = requester_id, column_id = column_id)
 
     try:
         db.session.add(new_card)
         db.session.commit()
 
-        pusher.trigger(f"board-{code}-{column_id}", 'card-created', {"column_id": column_id, "content": content, "id": new_card.id, "member_id": member_id})
+        pusher.trigger(f"board-{code}-{column_id}", 'card-created', {"column_id": column_id, "content": content, "id": new_card.id, "member_id": requester_id})
 
         return jsonify(card_schema.dump(new_card))
     except:
@@ -42,7 +45,9 @@ def create_card(member_id, code, column_id):
 
 @cards.route('<card_id>', methods=["DELETE"])
 def delete_card_by_id(member_id, code, column_id, card_id):
-    requester_id = request.cookies.get('member_id')
+    id_token = request.headers['Authorization']
+    decoded_token = auth.verify_id_token(id_token)
+    requester_id = decoded_token['user_id']
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
@@ -51,14 +56,14 @@ def delete_card_by_id(member_id, code, column_id, card_id):
         .filter(Card.id == card_id) \
         .filter(Column.id == column_id) \
         .filter(Board.code == code) \
-        .filter(Member.id == member_id) \
+        .filter(Member.firebase_user_id == requester_id) \
         .first()
 
     try:
         db.session.delete(card)
         db.session.commit()
 
-        pusher.trigger(f"board-{code}-{column_id}", 'card-deleted', {"id": card.id, "column_id": card.column_id, "member_id": card.member_id})
+        pusher.trigger(f"board-{code}-{column_id}", 'card-deleted', {"id": card.id, "column_id": card.column_id, "member_id": requester_id})
 
         return jsonify(card_schema.dump(card))
     except:
@@ -67,7 +72,9 @@ def delete_card_by_id(member_id, code, column_id, card_id):
 
 @cards.route('<card_id>/content', methods=["PUT"])
 def modify_card_content_by_id(member_id, code, column_id, card_id):
-    requester_id = request.cookies.get('member_id')
+    id_token = request.headers['Authorization']
+    decoded_token = auth.verify_id_token(id_token)
+    requester_id = decoded_token['user_id']
 
     if member_id != requester_id:
         return 'Unauthorized request', 401
@@ -76,7 +83,7 @@ def modify_card_content_by_id(member_id, code, column_id, card_id):
         .filter(Card.id == card_id) \
         .filter(Column.id == column_id) \
         .filter(Board.code == code) \
-        .filter(Member.id == member_id) \
+        .filter(Member.firebase_user_id == requester_id) \
         .first()
 
     new_content = request.json['content']

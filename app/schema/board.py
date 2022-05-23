@@ -6,7 +6,7 @@ class BoardSchema(ma.SQLAlchemyAutoSchema):
     name = fields.Str()
     code = fields.Str()
     date = fields.DateTime()
-    member_id = fields.Int()
+    member_firebase_id = fields.String()
     team_id = fields.Int()
     columns = fields.Nested(ColumnSchema, only=("id", "name", "cards"), many=True)
 
