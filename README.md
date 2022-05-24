@@ -179,3 +179,6 @@ $ heroku pg:info
 ```bash
 $ heroku pg:psql
 ```
+****
+
+* Use DB_CONNECTION_STRING=postgresql://postgres:mysecretpassword@0db:5432/easyretrospective variable on Docker-Compose

@@ -14,3 +14,4 @@ class Config:
     CLIENT_ID = os.environ['CLIENT_ID']
     CLIENT_X509_CERT_URL = os.environ['CLIENT_X509_CERT_URL']
     CORS_ORIGINS = os.environ['CORS_ORIGINS']
+    SENDIN_BLUE_API_KEY = os.environ['SENDIN_BLUE_API_KEY']
