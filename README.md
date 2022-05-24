@@ -123,12 +123,59 @@ $ flask db upgrade
 ****
 
 ### `Firebase-Admin Certificate example`
-```bash
 
+Create `cert` variable to store firebase-sdk environemnt variables to pass firebase credentials function. 
+```bash
+cert = {
+    "type": "service_account",
+    "project_id": app.config.get("PROJECT_ID"),
+    "private_key_id": app.config.get("PRIVATE_KEY_ID"),
+    "private_key": app.config.get("PRIVATE_KEY"),
+    "client_email": app.config.get("CLIENT_EMAIL"),
+    "client_id": app.config.get("CLIENT_ID"),
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": app.config.get("CLIENT_X509_CERT_URL"),
+}
 ```
+Then you just need to pass `app.config.["FIREBASE_ADMIN_CREDENTIAL"]` `cert ` variable.
 ****
 
 ### `Heroku Deployment`
+Download and install the Heroku CLI
 
+If you haven't already, log in to your Heroku account and follow the prompts to create a new SSH public key.
 ```bash
+$ heroku login
+```
+
+Deploy your changes
+```bash
+$ git add .
+$ git commit -am "make it better"
+$ git push heroku main
+```
+***
+
+### `Heroku postgresql commands`
+
+* Use the heroku addons command to determine whether your app already has Heroku Postgres provisioned:
+```bash
+$ heroku addons
+```
+
+* If heroku-postgresql doesn’t appear in your app’s list of add-ons, you can provision it with the following CLI command:
+```bash
+$ heroku addons:create heroku-postgresql:<PLAN_NAME>
+```
+
+* To see if your database is running on legacy infrastructure, use pg:info
+```bash
+$ heroku pg:info
+```
+
+* To connect postgresql shell on Heroku
+```bash
+$ heroku pg:psql
 ```
