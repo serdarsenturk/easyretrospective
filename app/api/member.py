@@ -8,8 +8,8 @@ from sib_api_v3_sdk.rest import ApiException
 from pprint import pprint
 from app.models.member import Member
 
-member = Blueprint('member', __name__)
-CORS(member, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}}, supports_credentials=True)
+members = Blueprint('members', __name__)
+CORS(members, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}}, supports_credentials=True)
 
 # Configure API key authorization: api-key
 configuration = sib_api_v3_sdk.Configuration()
@@ -37,7 +37,7 @@ def send_greeting_mail(user_id, email):
     except ApiException as e:
         print("Exception when calling SMTPApi->send_transac_email: %s\n" % e)
 
-@member.route('/api/v1/member/create', methods=["POST"])
+@members.route('/api/v1/member/create', methods=["POST"])
 def create_member():
     id_token = request.headers['Authorization']
 
