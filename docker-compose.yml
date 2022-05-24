@@ -1,19 +1,19 @@
 version: '3.8'
 
 services: 
-  api:
-    build: .
-    ports:
-      - 5000:5000
-    expose:
-      - 5000
-    restart: always
-    env_file:
-      - .env
-    volumes:
-      - .:/app
-    depends_on:
-      - database
+#  api:
+#    build: .
+#    ports:
+#      - 5000:5000
+#    expose:
+#      - 5000
+#    restart: always
+#    env_file:
+#      - .env
+#    volumes:
+#      - .:/app
+#    depends_on:
+#      - database
 
   database:
     privileged: true
@@ -31,20 +31,20 @@ services:
       - ~/dockerdata/postgresql:/var/lib/postgresql/data
     restart: always
 
-  frontend:
-    ports:
-      - 3000:3000
-    build:
-      context: ../easyretrospective-frontend
-    environment:
-      BACKEND_URL: http://api:5000
-      NEXT_PUBLIC_BACKEND_URL: http://localhost:5000
-    env_file:
-      - ../easyretrospective-frontend/.env
-    command: npm run dev
-    volumes:
-      - ../easyretrospective-frontend:/usr/src
-      - /usr/src/app/node_modules
-      - /usr/src/app/.next
-    depends_on:
-      - database
+#  frontend:
+#    ports:
+#      - 3000:3000
+#    build:
+#      context: ../easyretrospective-frontend
+#    environment:
+#      BACKEND_URL: http://api:5000
+#      NEXT_PUBLIC_BACKEND_URL: http://localhost:5000
+#    env_file:
+#      - ../easyretrospective-frontend/.env
+#    command: npm run dev
+#    volumes:
+#      - ../easyretrospective-frontend:/usr/src
+#      - /usr/src/app/node_modules
+#      - /usr/src/app/.next
+#    depends_on:
+#      - database
