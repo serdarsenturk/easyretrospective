@@ -41,6 +41,7 @@ from app.api.board import boards
 from app.api.column import columns
 from app.api.card import cards
 from app.api.member import members
+from app.api.team import teams
 
 #Register blueprint(s)
 app.register_blueprint(home)
@@ -48,5 +49,6 @@ app.register_blueprint(boards)
 app.register_blueprint(columns)
 app.register_blueprint(cards)
 app.register_blueprint(members)
+app.register_blueprint(teams)
 
 db.create_all()
