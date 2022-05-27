@@ -4,7 +4,7 @@ class Member(db.Model):
     __tablename__ = 'members'
 
     teams_members = db.Table('teams_members',
-                    db.Column('member_id', db.Integer, db.ForeignKey('members.id'), primary_key=True),
+                    db.Column('member_id', db.String(30), db.ForeignKey('members.firebase_user_id'), primary_key=True),
                     db.Column('team_id', db.Integer, db.ForeignKey('teams.id'), primary_key=True)
                     )
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
