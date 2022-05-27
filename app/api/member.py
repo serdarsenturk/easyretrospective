@@ -17,6 +17,7 @@ configuration.api_key['api-key'] = app.config.get("SENDIN_BLUE_API_KEY")
 
 api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
 
+
 def send_greeting_mail(user_id, email):
     subject = f"{email}: Thank you for registering."
     sender = {"name": "Serdar Senturk", "email": "serdarsenturk@windowslive.com"}
@@ -28,7 +29,7 @@ def send_greeting_mail(user_id, email):
     params = {"parameter": "My param value", "subject": "New Subject"}
     send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, bcc=bcc, cc=cc, reply_to=reply_to, headers=headers,
                                                    sender=sender, subject=subject, params=params,
-                                                    template_id=1)
+                                                   template_id=1)
 
     try:
         # Send a transactional email
@@ -37,7 +38,8 @@ def send_greeting_mail(user_id, email):
     except ApiException as e:
         print("Exception when calling SMTPApi->send_transac_email: %s\n" % e)
 
-@members.route('/api/v1/member/create', methods=["POST"])
+
+@members.route('/api/v1/members/create', methods=["POST"])
 def create_member():
     id_token = request.headers['Authorization']
 
