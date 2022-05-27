@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "db8c8f4299ebec4864adf4a18cc28394be5c791137d942dd4929b7e17b3d0aaa"
+            "sha256": "0851505bf08cadd0cf0cc3eef930f07c3c156aff304f131c5d23cda3d18eaf1d"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1055,6 +1055,13 @@
             ],
             "index": "pypi",
             "version": "==4.8"
+        },
+        "sib-api-v3-sdk": {
+            "hashes": [
+                "sha256:3123585e9ab2825a62bcad0bcaacb129727097a009371cd11137c04a3477d5e2"
+            ],
+            "index": "pypi",
+            "version": "==7.4.0"
         },
         "six": {
             "hashes": [
