@@ -14,9 +14,12 @@ from app.models.board import Board
 from app.models.column import Column
 from app.models.member import Member
 from app.models.team import Team
+from app.decorators.authentication_decorators import token_required
+
 
 boards = Blueprint('boards', __name__)
 CORS(boards, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}}, supports_credentials=True)
+
 
 pusher = Pusher(
     app_id=app.config.get('PUSHER_APP_ID'),
@@ -26,6 +29,7 @@ pusher = Pusher(
     ssl=True
 )
 
+
 def add_default_properties(board):
     generate_board_code(board)
 
@@ -33,7 +37,8 @@ def add_default_properties(board):
     board.date = date
     board.name = f"Retro {date.strftime('%d/%m/%y')}"
 
-    columns = [Column(name = "What went well", board_id= board.id), Column(name = "What didn't go well ", board_id= board.id), Column(name = "To improve", board_id= board.id)]
+    columns = [Column(name="What went well", board_id=board.id), Column(name="What didn't go well ", board_id=board.id),
+               Column(name="To improve", board_id=board.id)]
     board.columns = columns
 
     db.session.add(board)
@@ -45,59 +50,90 @@ def add_default_properties(board):
         db.session.rollback()
         return add_default_properties(board)
 
+
 def generate_board_code(board):
     board.id = db.session.execute(Sequence("boards_id_seq"))
     board.code = base62.encode(hash(('boards', board.id)), 8)[-8:]
 
     return board
 
+
 @boards.route('/api/v1/members/<member_id>/boards', methods=["POST"])
+@token_required
 def create_board(member_id):
-    id_token = request.headers['Authorization']
-    decoded_token = auth.verify_id_token(id_token)
-    requester_id = decoded_token['user_id']
-
-    if member_id != requester_id:
-        return 'Unauthorized request', 401
-
-    member = db.session.query(Member) \
-        .filter(Member.firebase_user_id == requester_id) \
-        .first()
-
-    if not member:
-        return 'Unauthorized request', 401
-
     try:
         team_id = request.json["team_id"]
-        temp_board = Board(member_firebase_id=requester_id, team_id=team_id)
+        temp_board = Board(member_firebase_id=member_id, team_id=team_id)
 
         new_board = add_default_properties(temp_board)
-        pusher.trigger(f"member-{requester_id}", "board-created",
+        pusher.trigger(f"member-{member_id}", "board-created",
                        {
                            "code": new_board.code,
                            "date": new_board.date.__str__(),
                            "member_firebase_id": new_board.member_firebase_id,
                            "name": new_board.name,
                            "team_id": new_board.team_id,
-                       }
-                       )
+                       })
 
         return board_schema.dump(new_board), 201
-    except Exception:
+    except:
         return 'Board creation failed, try again', 500
 
-@boards.route('/api/v1/members/<member_id>/boards/<code>', methods=["DELETE"])
-def delete_board_by_code(member_id, code):
+
+@boards.route('/api/v1/boards/<code>', methods=["GET"])
+@token_required
+def get_board_by_code(code):
     id_token = request.headers['Authorization']
     decoded_token = auth.verify_id_token(id_token)
     requester_id = decoded_token['user_id']
 
-    if member_id != requester_id:
-        return 'Unauthorized request', 401
+    # requester_id = request.cookies.get('user_id')
 
     member = db.session.query(Member) \
         .filter(Member.boards.any(Board.code == code)) \
         .filter(Member.firebase_user_id == requester_id) \
+        .first()
+
+    if not member:
+        return 'Member does not exist', 404
+
+    board = db.session.query(Board) \
+        .filter(Board.code == code) \
+        .first()
+
+    return jsonify(board_schema.dump(board))
+
+
+@boards.route('/api/v1/members/<member_id>/boards/<code>/name', methods=["PUT"])
+@token_required
+def modify_board_name_by_code(member_id, code):
+    board = db.session.query(Board) \
+        .filter(Board.code == code) \
+        .filter(Board.member_firebase_id == member_id) \
+        .first()
+
+    modified_name = request.json['name']
+
+    board.name = modified_name
+
+    try:
+        db.session.commit()
+
+        pusher.trigger(f"member-{member_id}", "board-updated",
+                       {"code": code, "name": board.name, "date": board.date.__str__()})
+
+        return jsonify(board_schema.dump(board)), 201
+    except IntegrityError:
+        db.session.rollback()
+        return 'Board name could not updated, try again.', 500
+
+
+@boards.route('/api/v1/members/<member_id>/boards/<code>', methods=["DELETE"])
+@token_required
+def delete_board_by_code(member_id, code):
+    member = db.session.query(Member) \
+        .filter(Member.boards.any(Board.code == code)) \
+        .filter(Member.firebase_user_id == member_id) \
         .first()
 
     if not member:
@@ -114,124 +150,24 @@ def delete_board_by_code(member_id, code):
 
     return 'Board deleted', 200
 
-@boards.route('/api/v1/boards/<code>', methods=["GET"])
-def get_board_by_code(code):
-    id_token = request.headers['Authorization']
-    decoded_token = auth.verify_id_token(id_token)
-    requester_id = decoded_token['user_id']
-
-    if not requester_id:
-        return 'Unauthorized request', 401
-
-    member = db.session.query(Member) \
-        .filter(Member.boards.any(Board.code == code)) \
-        .filter(Member.firebase_user_id == requester_id) \
-        .first()
-
-    if not member:
-        return 'Member does not exist', 404
-
-    board = db.session.query(Board) \
-        .filter(Board.code == code) \
-        .first()
-
-    return jsonify(board_schema.dump(board))
-
-@boards.route('/api/v1/members/<member_id>/boards/<code>/name', methods=["PUT"])
-def modify_board_name_by_code(member_id, code):
-    id_token = request.headers['Authorization']
-    decoded_token = auth.verify_id_token(id_token)
-    requester_id = decoded_token['user_id']
-
-    if member_id != requester_id:
-        return 'Unauthorized request', 401
-
-    member = db.session.query(Member) \
-        .filter(Member.firebase_user_id == requester_id) \
-        .first()
-
-    if not member:
-        return 'Member does not exist', 404
-
-    board = db.session.query(Board) \
-        .filter(Board.code == code) \
-        .filter(Board.member_firebase_id == requester_id) \
-        .first()
-
-    modified_name = request.json['name']
-
-    board.name = modified_name
-
-    try:
-        db.session.commit()
-
-        pusher.trigger(f"member-{requester_id}", "board-updated", {"code": code, "name": board.name, "date": board.date.__str__()})
-
-        return jsonify(board_schema.dump(board)), 201
-    except IntegrityError:
-        db.session.rollback()
-        return 'Board name could not updated, try again.', 500
 
 @boards.route('/api/v1/members/<member_id>/boards', methods=["GET"])
+@token_required
 def get_member_boards(member_id):
-    id_token = request.headers['Authorization']
-    decoded_token = auth.verify_id_token(id_token)
-    requester_id = decoded_token['user_id']
-
-    if member_id != requester_id:
-        return 'Unauthorized request', 401
-
-    member = db.session.query(Member) \
-        .filter(Member.firebase_user_id == requester_id) \
-        .first()
-
-    if not member:
-        return 'Member does not exist', 404
-
     member_boards = db.session.query(Board) \
-        .filter(Board.member_firebase_id == requester_id) \
+        .filter(Board.member_firebase_id == member_id) \
         .filter(Board.team_id == None) \
         .order_by(desc(Board.date)) \
         .limit(8)
 
     return jsonify(member_boards_schema.dump(member_boards))
 
-@boards.route('/api/v1/teams/<team_id>/boards', methods=["GET"])
-def get_team_boards(team_id):
-    id_token = request.headers['Authorization']
-    decoded_token = auth.verify_id_token(id_token)
-    requester_id = decoded_token['user_id']
-
-    if not requester_id:
-        return 'Unauthorized request', 401
-
-    member = db.session.query(Member) \
-        .filter(Member.teams.any(Team.id == team_id)) \
-        .filter(Member.firebase_user_id == requester_id) \
-        .first()
-
-    if not member:
-            return 'Member does not exists', 404
-
-    team_boards = db.session.query(Board) \
-        .filter(Board.team_id == team_id) \
-        .filter(Board.member_firebase_id == requester_id) \
-        .order_by(desc(Board.date)) \
-        .limit(8)
-
-    return jsonify(boards_schema.dump(team_boards)), 200
 
 @boards.route('/api/v1/members/<member_id>/teams', methods=["GET"])
+@token_required
 def get_teams(member_id):
-    id_token = request.headers['Authorization']
-    decoded_token = auth.verify_id_token(id_token)
-    requester_id = decoded_token['user_id']
-
-    if member_id != requester_id:
-        return 'Unauthorized request', 401
-
     member = db.session.query(Member) \
-        .filter(Member.firebase_user_id == requester_id) \
+        .filter(Member.firebase_user_id == member_id) \
         .first()
 
     if not member:
@@ -241,3 +177,27 @@ def get_teams(member_id):
         return jsonify(teams_schema.dump(member.teams))
     except:
         return 'User"s team not found', 404
+
+
+@boards.route('/api/v1/teams/<team_id>/boards', methods=["GET"])
+@token_required
+def get_team_boards(team_id):
+    id_token = request.headers['Authorization']
+    decoded_token = auth.verify_id_token(id_token)
+    requester_id = decoded_token['user_id']
+
+    member = db.session.query(Member) \
+        .filter(Member.teams.any(Team.id == team_id)) \
+        .filter(Member.firebase_user_id == requester_id) \
+        .first()
+
+    if not member:
+        return 'Member does not exists', 404
+
+    team_boards = db.session.query(Board) \
+        .filter(Board.team_id == team_id) \
+        .filter(Board.member_firebase_id == requester_id) \
+        .order_by(desc(Board.date)) \
+        .limit(8)
+
+    return jsonify(boards_schema.dump(team_boards)), 200

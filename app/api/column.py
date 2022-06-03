@@ -1,15 +1,17 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import CORS
 from pusher import Pusher
-from firebase_admin import auth
 from app import db, app
 from app.models.board import Board
 from app.models.column import Column
 from app.schema.column import column_schema
 from app.schema.column_updated import column_updated_schema
+from app.decorators.authentication_decorators import token_required
+
 
 columns = Blueprint('columns', __name__, url_prefix='/api/v1/members/<member_id>/boards/<code>/columns')
 CORS(columns, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS')}}, supports_credentials=True)
+
 
 pusher = Pusher(
     app_id=app.config.get('PUSHER_APP_ID'),
@@ -19,25 +21,20 @@ pusher = Pusher(
     ssl=True
 )
 
+
 @columns.route('', methods=["POST"])
+@token_required
 def create_column(member_id, code):
-    id_token = request.headers['Authorization']
-    decoded_token = auth.verify_id_token(id_token)
-    requester_id = decoded_token['user_id']
-
-    if member_id != requester_id:
-        return 'Unauthorized request', 401
-
     name = request.json['name']
 
     board = db.session.query(Board) \
         .filter(Board.code == code) \
-        .filter(Board.member_firebase_id == requester_id) \
+        .filter(Board.member_firebase_id == member_id) \
         .first()
 
     board_id = board.id
 
-    new_column = Column(name = name, board_id=board_id)
+    new_column = Column(name=name, board_id=board_id)
 
     try:
         db.session.add(new_column)
@@ -49,20 +46,18 @@ def create_column(member_id, code):
     except:
         db.session.rollback()
 
+
 @columns.route('<column_id>', methods=['DELETE'])
+@token_required
 def delete_column_by_id(member_id, code, column_id):
-    id_token = request.headers['Authorization']
-    decoded_token = auth.verify_id_token(id_token)
-    requester_id = decoded_token['user_id']
-
-    if member_id != requester_id:
-        return 'Unauthorized request', 401
-
     column = db.session.query(Column) \
         .filter(Board.code == code ) \
-        .filter(Board.member_firebase_id == requester_id) \
+        .filter(Board.member_firebase_id == member_id) \
         .filter(Column.id == column_id) \
         .first()
+
+    if not column:
+        return 'Column could not find!', 500
 
     try:
         db.session.delete(column)
@@ -76,19 +71,16 @@ def delete_column_by_id(member_id, code, column_id):
 
 
 @columns.route('<column_id>/name', methods=['PUT'])
+@token_required
 def modify_column_by_id(member_id, code, column_id):
-    id_token = request.headers['Authorization']
-    decoded_token = auth.verify_id_token(id_token)
-    requester_id = decoded_token['user_id']
-
-    if member_id != requester_id:
-        return 'Unauthorized request', 401
-
     column = db.session.query(Column) \
-        .filter(Board.code == code ) \
-        .filter(Board.member_firebase_id == requester_id) \
+        .filter(Board.code == code) \
+        .filter(Board.member_firebase_id == member_id) \
         .filter(Column.id == column_id) \
         .first()
+
+    if not column:
+        return 'Column could not find!', 500
 
     name = request.json['name']
 
